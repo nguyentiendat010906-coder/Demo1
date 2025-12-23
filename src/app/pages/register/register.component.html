@@ -1,0 +1,41 @@
+<div class="auth-wrapper">
+  <div class="auth-box">
+    <h2>Đăng ký</h2>
+
+    <div class="form-group">
+      <label>Tài khoản</label>
+      <input
+        [(ngModel)]="username"
+        placeholder="Nhập tài khoản"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Mật khẩu</label>
+      <input
+        type="password"
+        [(ngModel)]="password"
+        placeholder="Nhập mật khẩu"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Xác nhận mật khẩu</label>
+      <input
+        type="password"
+        [(ngModel)]="confirmPassword"
+        placeholder="Nhập lại mật khẩu"
+      />
+    </div>
+
+    <button (click)="register()">Đăng ký</button>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+    <p class="success" *ngIf="success">{{ success }}</p>
+
+    <p class="link">
+      Đã có tài khoản?
+      <span (click)="goLogin()">Đăng nhập</span>
+    </p>
+  </div>
+</div>

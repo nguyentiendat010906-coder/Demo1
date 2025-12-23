@@ -1,12 +1,19 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'demo1';
+  constructor(public router: Router) {}
+
+  logout() {
+    localStorage.removeItem('loggedIn');
+    this.router.navigate(['/login']);
+  }
 }

@@ -1,0 +1,46 @@
+<div class="tables-page">
+  <h2>Phòng - Bàn</h2>
+
+  <div class="stats">
+    <div class="stat">Tổng bàn <strong>{{ tables.length }}</strong></div>
+    <div class="stat">Đang phục vụ <strong>{{ servingCount }}</strong></div>
+    <div class="stat">Trống <strong>{{ emptyCount }}</strong></div>
+    <div class="stat">Đã đặt <strong>{{ reservedCount }}</strong></div>
+  </div>
+
+  <!-- HIỂN THỊ THEO NHÓM -->
+  <div *ngFor="let group of groups" class="group-block">
+    <h3>{{ group.name }}</h3>
+
+    <div class="table-grid">
+      <div
+        class="table-card"
+        *ngFor="let t of group.tables"
+        (click)="openTable(t)"
+      >
+        <div class="card-header">
+          <strong>{{ t.name }}</strong>
+          <span class="dot" [ngClass]="t.status"></span>
+        </div>
+
+        <p>Sức chứa: {{ t.capacity }} người</p>
+
+        <span class="badge" [ngClass]="t.status">
+          {{ getStatusText(t.status) }}
+        </span>
+
+        <button
+          *ngIf="t.status === 'empty'"
+          (click)="openTable(t); $event.stopPropagation()">
+          Mở bàn
+        </button>
+
+        <button
+          *ngIf="t.status === 'reserved'"
+          (click)="confirmReserved(t); $event.stopPropagation()">
+          Xác nhận khách tới
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

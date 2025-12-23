@@ -1,0 +1,90 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f7fb;
+}
+
+.auth-box {
+  width: 360px;
+  background: #fff;
+  padding: 28px;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  display: block;
+}
+
+input:focus {
+  border-color: #2563eb;
+}
+
+button {
+  width: 100%;
+  margin-top: 6px;
+  padding: 11px 12px;
+  background: #2563eb;   /* register có thể đổi màu */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  display: block;
+}
+
+.error,
+.success {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.error {
+  color: #dc2626;
+}
+
+.success {
+  color: #16a34a;
+}
+
+.link {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.link span {
+  color: #2563eb;
+  cursor: pointer;
+}

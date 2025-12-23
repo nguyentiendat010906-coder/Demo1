@@ -1,0 +1,99 @@
+<div class="search-input">
+  <svg class="icon" viewBox="0 0 24 24">
+    <circle cx="11" cy="11" r="7"></circle>
+    <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+  </svg>
+  <input type="text" placeholder="Tìm kiếm khách hàng..." />
+</div>
+<h2 class="title">Danh sách hóa đơn</h2>
+
+<table class="invoice-table">
+  <thead>
+    <tr>
+      <th>Mã</th>
+      <th>Khách hàng</th>
+      <th>Ngày</th>
+      <th>Trạng thái</th>
+      <th>Tổng tiền</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let i of invoices">
+      <td>#{{ i.id }}</td>
+      <td>{{ i.customerName }}</td>
+      <td>{{ i.invoiceDate | date:'dd/MM/yyyy' }}</td>
+     <td>
+  <span
+    class="status paid"
+    *ngIf="i.status === 'Đã thanh toán'">
+    {{ i.status }}
+  </span>
+
+  <span
+    class="status unpaid"
+    *ngIf="i.status === 'Chưa thanh toán'">
+    {{ i.status }}
+  </span>
+</td>
+
+      <td>{{ i.totalAmount | number }} đ</td>
+      <td>
+        <button class="btn-view" (click)="viewDetail(i.id)">Xem</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- MODAL -->
+<div class="modal-backdrop" *ngIf="selectedInvoice">
+  <div class="modal">
+
+    <h3>Chi tiết hóa đơn #{{ selectedInvoice.id }}</h3>
+
+    <div class="info">
+       <p><b>Khách hàng:</b> {{ selectedInvoice.customer.name }}</p>
+  <p><b>Số điện thoại:</b> {{ selectedInvoice.customer.phone }}</p>
+  <p><b>Địa chỉ:</b> {{ selectedInvoice.customer.address }}</p>
+  <p><b>Ngày lập:</b> {{ selectedInvoice.invoiceDate | date:'dd/MM/yyyy' }}</p>
+  <p>
+  <b>Trạng thái:</b>
+  <span
+    class="status"
+    [ngClass]="{
+      paid: selectedInvoice.status === 'PAID',
+      unpaid: selectedInvoice.status === 'PENDING'
+    }"
+  >
+    {{ selectedInvoice.status === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
+  </span>
+</p>
+
+    </div>
+
+    <table class="detail-table" *ngIf="selectedInvoice.invoiceDetails?.length">
+      <thead>
+        <tr>
+          <th>Sản phẩm</th>
+          <th>SL</th>
+          <th>Đơn giá</th>
+          <th>Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of selectedInvoice.invoiceDetails">
+          <td>{{ d.productName }}</td>
+          <td>{{ d.quantity }}</td>
+          <td>{{ d.unitPrice | number }} đ</td>
+          <td>{{ d.quantity * d.unitPrice | number }} đ</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="total">
+      Tổng tiền: {{ selectedInvoice.totalAmount | number }} đ
+    </div>
+
+    <button class="btn-close" (click)="closeModal()">Đóng</button>
+  </div>
+</div>

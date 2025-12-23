@@ -1,0 +1,81 @@
+<div class="pos-layout">
+
+  <!-- MENU -->
+  <div class="menu-panel">
+    <h3 class="panel-title">Menu</h3>
+
+    <div class="menu-item"
+         *ngFor="let m of menu"
+         (click)="addItem(m)">
+      <span class="menu-name">{{ m.name }}</span>
+      <span class="menu-price">{{ m.price | number }} đ</span>
+    </div>
+  </div>
+
+  <!-- INVOICE -->
+  <div class="invoice-panel">
+
+    <!-- HEADER -->
+   <div class="invoice-header">
+  <!-- LEFT -->
+  <div class="header-left">
+    <h3>Bàn {{ tableId }}</h3>
+    <div> {{ floor }}</div>
+    <div>Thu ngân: <b>{{ cashier }}</b></div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="header-right">
+    <div class="time">
+      <div>Giờ vào: {{ startTime | date:'HH:mm dd/MM/yyyy' }}</div>
+      <div>Phục vụ: {{ serviceMinutes }} phút</div>
+    </div>
+
+    <div class="grand-total">
+      {{ total | number }} đ
+    </div>
+  </div>
+</div>
+
+
+    <!-- ITEMS -->
+    <div class="invoice-items">
+      <div class="item-row" *ngFor="let i of items">
+        <div class="item-name">{{ i.name }}</div>
+
+        <input
+          class="qty"
+          type="number"
+          [(ngModel)]="i.quantity"
+          min="1"
+        />
+
+        <div class="item-price">
+          {{ i.price * i.quantity | number }} đ
+        </div>
+
+        <button class="remove" (click)="remove(i)">✕</button>
+      </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary">
+      <div class="line">
+        <span>Tạm tính</span>
+        <span>{{ subTotal | number }} đ</span>
+      </div>
+      <div class="line">
+        <span>VAT (10%)</span>
+        <span>{{ vat | number }} đ</span>
+      </div>
+
+      <div class="line total">
+        <b>Thanh toán</b>
+        <b>{{ total | number }} đ</b>
+      </div>
+
+      <button class="pay">Thanh toán</button>
+    </div>
+
+  </div>
+</div>

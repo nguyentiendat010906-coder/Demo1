@@ -1,0 +1,51 @@
+<div class="container">
+  <h2>Quản lý nhóm bàn</h2>
+
+  <!-- Thêm nhóm mới -->
+  <div class="add-group">
+    <input 
+      [(ngModel)]="newGroupName" 
+      placeholder="Tên nhóm (VD: Tầng 1, Khu VIP...)"
+      (keyup.enter)="addGroup()"
+    />
+    <button (click)="addGroup()">➕ Thêm nhóm</button>
+  </div>
+
+  <!-- Danh sách nhóm -->
+  <div class="groups-list">
+    <div *ngFor="let group of tableGroups" class="group-card">
+      <div class="group-header">
+        <h3 (click)="toggleGroup(group.id)">
+          {{ expandedGroups[group.id] ? '▼' : '▶' }} {{ group.name }}
+          <span class="table-count">({{ group.tables.length }} bàn)</span>
+        </h3>
+        <button class="delete-btn" (click)="deleteGroup(group.id)">🗑️</button>
+      </div>
+
+      <div *ngIf="expandedGroups[group.id]" class="group-content">
+        <!-- Thêm bàn -->
+        <div class="add-table">
+          <input 
+            [(ngModel)]="newTableNames[group.id]" 
+            placeholder="Tên bàn (VD: Bàn 1, Bàn A...)"
+            (keyup.enter)="addTable(group.id)"
+          />
+          <button (click)="addTable(group.id)">➕ Thêm bàn</button>
+        </div>
+
+        <!-- Danh sách bàn -->
+        <div class="tables-grid">
+          <div *ngFor="let table of group.tables" 
+               class="table-card"
+               [class.occupied]="table.status === 'occupied'"
+               [class.reserved]="table.status === 'reserved'">
+            <div class="table-name">{{ table.name }}</div>
+            <div class="table-status">{{ table.status }}</div>
+            <button class="delete-table-btn" 
+                    (click)="deleteTable(group.id, table.id)">✖</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

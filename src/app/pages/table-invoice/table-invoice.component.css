@@ -1,0 +1,143 @@
+/* ===== LAYOUT ===== */
+.pos-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+}
+
+/* ===== PANEL ===== */
+.menu-panel,
+.invoice-panel {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* ===== MENU ===== */
+.panel-title {
+  margin-bottom: 12px;
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 6px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: #f5f7fa;
+}
+
+.menu-price {
+  font-weight: 600;
+}
+
+/* ===== INVOICE HEADER ===== */
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* 🔥 QUAN TRỌNG */
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 12px;
+}
+
+/* LEFT */
+.header-left h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.header-left div {
+  font-size: 14px;
+  color: #555;
+  margin-top: 2px;
+}
+
+/* RIGHT */
+.header-right {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 🔥 ép xuống ngang hàng */
+  gap: 6px;
+}
+
+.header-right .time {
+  font-size: 14px;
+  color: #666;
+}
+
+/* TỔNG TIỀN */
+.grand-total {
+  font-size: 22px;
+  font-weight: bold;
+  color: #2563eb;
+}
+
+
+/* ===== ITEMS ===== */
+.invoice-items {
+  border-top: 1px solid #eee;
+  margin-top: 12px;
+}
+
+.item-row {
+  display: grid;
+  grid-template-columns: 1fr 70px 120px 30px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.item-name {
+  font-weight: 500;
+}
+
+.qty {
+  width: 60px;
+  padding: 4px;
+}
+
+.item-price {
+  text-align: right;
+  font-weight: 600;
+}
+
+.remove {
+  border: none;
+  background: transparent;
+  color: red;
+  cursor: pointer;
+}
+
+/* ===== SUMMARY ===== */
+.summary {
+  margin-top: 16px;
+}
+
+.summary .line {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0;
+}
+
+.summary .total {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.pay {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: #16a34a;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+}

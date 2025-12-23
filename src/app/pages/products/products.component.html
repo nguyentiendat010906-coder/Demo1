@@ -1,0 +1,50 @@
+<h2 class="page-title">Thực đơn</h2>
+
+<div class="table-container" *ngIf="products.length; else empty">
+  <table class="menu-table">
+    <thead>
+      <tr>
+        <th>Tên món</th>
+        <th>Danh mục</th>
+        <th>Giá</th>
+        <th>Tồn kho</th>
+        <th>Trạng thái</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let p of products">
+        <td>{{ p.name }}</td>
+        <td>{{ p.category }}</td>
+        <td>{{ p.price | number }}đ</td>
+        <td>{{ p.stock }}</td>
+        <td>
+          <span
+            class="status in-stock"
+            *ngIf="p.stock > 10"
+          >
+            Còn hàng
+          </span>
+
+          <span
+            class="status low-stock"
+            *ngIf="p.stock > 0 && p.stock <= 10"
+          >
+            Sắp hết
+          </span>
+
+          <span
+            class="status out-stock"
+            *ngIf="p.stock === 0"
+          >
+            Hết hàng
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<ng-template #empty>
+  <p class="empty-text">Chưa có sản phẩm</p>
+</ng-template>

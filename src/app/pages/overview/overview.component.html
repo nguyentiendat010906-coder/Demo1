@@ -1,0 +1,70 @@
+<div class="overview">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <h2>Tổng quan</h2>
+      <p>📅 Hôm nay</p>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card blue">
+      <div class="icon">📄</div>
+      <div>
+        <p>Hóa đơn</p>
+        <h3>{{ totalInvoices }}</h3>
+      </div>
+    </div>
+
+    <div class="stat-card green">
+      <div class="icon">📈</div>
+      <div>
+        <p>Doanh thu</p>
+        <h3>{{ totalRevenue | number }} đ</h3>
+      </div>
+    </div>
+
+    <div class="stat-card orange">
+      <div class="icon">🍽️</div>
+      <div>
+        <p>Bàn đang phục vụ</p>
+        <h3>{{ servingTables }}</h3>
+      </div>
+    </div>
+
+    <div class="stat-card purple">
+      <div class="icon">💵</div>
+      <div>
+        <p>Tiền mặt</p>
+        <h3>{{ cashAmount | number }} đ</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    
+    <!-- CHART -->
+    <div class="card chart-card">
+      <h4>Doanh thu</h4>
+      <p class="total">{{ totalRevenue | number }} đ</p>
+      <canvas id="revenueChart"></canvas>
+    </div>
+
+    <!-- TOP PRODUCTS -->
+    <div class="card">
+      <h4>Top 5 đồ uống bán chạy</h4>
+      <ul class="top-list">
+        <li *ngFor="let p of topProducts; index as i">
+          <span class="rank">{{ i + 1 }}</span>
+          <span class="name">{{ p.name }}</span>
+          <span class="qty">{{ p.quantity }}</span>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+</div>
