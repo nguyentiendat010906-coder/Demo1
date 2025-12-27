@@ -6,7 +6,7 @@
 
 .tables-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%);
   padding: 32px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
@@ -32,7 +32,7 @@
 .title-section h1 {
   font-size: 32px;
   font-weight: 800;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: flex;
@@ -44,7 +44,7 @@
 .icon-restaurant {
   width: 36px;
   height: 36px;
-  stroke: #6366f1;
+  stroke: #1e40af;
   stroke-width: 2.5;
 }
 
@@ -79,8 +79,8 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
 }
 
-.stat-card.total { border-color: #e0e7ff; }
-.stat-card.total .stat-icon { background: linear-gradient(135deg, #818cf8, #6366f1); }
+.stat-card.total { border-color: #dbeafe; }
+.stat-card.total .stat-icon { background: linear-gradient(135deg, #3b82f6, #1e40af); }
 
 .stat-card.serving { border-color: #dbeafe; }
 .stat-card.serving .stat-icon { background: linear-gradient(135deg, #60a5fa, #3b82f6); }
@@ -158,7 +158,7 @@
 .control-icon {
   width: 20px;
   height: 20px;
-  stroke: #6366f1;
+  stroke: #1e40af;
   stroke-width: 2.5;
 }
 
@@ -185,14 +185,14 @@
 .modern-select:focus,
 .table-input:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  border-color: #1e40af;
+  box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
 }
 
 .btn-primary,
 .btn-add-table {
   padding: 14px 24px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -216,7 +216,7 @@
 .btn-primary:hover,
 .btn-add-table:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 8px 20px rgba(30, 64, 175, 0.4);
 }
 
 .btn-primary:active,
@@ -252,7 +252,7 @@
 .group-icon {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -289,8 +289,8 @@
 /* Tables Grid */
 .tables-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 16px;
 }
 
 .table-card {
@@ -303,9 +303,9 @@
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 20px;
-  padding: 3px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  border-radius: 18px;
+  padding: 2.5px;
+  background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -318,34 +318,34 @@
 }
 
 .table-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-6px);
 }
 
 .table-card-inner {
   background: #fff;
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 16px;
+  gap: 10px;
 }
 
 .table-card:hover .table-card-inner {
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 .table-status-badge {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 13px;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -369,8 +369,8 @@
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
@@ -393,14 +393,14 @@
 }
 
 .table-icon-wrapper {
-  width: 80px;
-  height: 80px;
+  width: 56px;
+  height: 56px;
   background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-  border-radius: 20px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 8px 0;
+  margin: 2px 0;
 }
 
 .table-card[data-status="empty"] .table-icon-wrapper {
@@ -416,8 +416,8 @@
 }
 
 .table-icon {
-  width: 40px;
-  height: 40px;
+  width: 28px;
+  height: 28px;
   stroke: #64748b;
   stroke-width: 2;
 }
@@ -435,10 +435,10 @@
 }
 
 .table-name {
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 800;
   color: #1e293b;
-  margin: 4px 0;
+  margin: 2px 0;
 }
 
 .table-actions {
@@ -448,23 +448,23 @@
 
 .btn-action {
   width: 100%;
-  padding: 14px 20px;
+  padding: 11px 14px;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.3s ease;
   color: white;
 }
 
 .btn-action svg {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   stroke-width: 2.5;
 }
 
@@ -482,7 +482,7 @@
 
 .btn-action:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .btn-action:active {
@@ -528,6 +528,6 @@
   }
   
   .tables-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   }
 }

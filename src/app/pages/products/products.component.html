@@ -1,4 +1,14 @@
+<div class="page-content">
 <h2 class="page-title">Thực đơn</h2>
+
+<div class="search-input">
+  <svg class="icon" viewBox="0 0 24 24">
+    <circle cx="11" cy="11" r="7"></circle>
+    <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+  </svg>
+  <input type="text" placeholder="Tìm kiếm khách hàng..." />
+</div>
+
 
 <div class="table-container" *ngIf="products.length; else empty">
   <table class="menu-table">
@@ -44,7 +54,7 @@
     </tbody>
   </table>
 </div>
-
+</div>
 <ng-template #empty>
   <p class="empty-text">Chưa có sản phẩm</p>
 </ng-template>

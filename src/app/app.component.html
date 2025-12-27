@@ -1,7 +1,12 @@
 <div class="layout">
 
+
   <!-- SIDEBAR -->
-  <aside class="sidebar">
+  <aside
+  class="sidebar"
+  *ngIf="router.url !== '/login' && router.url !== '/register'"
+>
+
 
     <div class="brand">
       <img
