@@ -35,6 +35,12 @@ export class LoginComponent {
       }
     });
   }
+  // Biến kiểm soát ẩn/hiện mật khẩu
+  showPassword = false;
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
   goRegister() {
   this.router.navigate(['/register']);
 }

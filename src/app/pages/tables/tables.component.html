@@ -1,46 +1,178 @@
 <div class="tables-page">
-  <h2>Phòng - Bàn</h2>
-
-  <div class="stats">
-    <div class="stat">Tổng bàn <strong>{{ tables.length }}</strong></div>
-    <div class="stat">Đang phục vụ <strong>{{ servingCount }}</strong></div>
-    <div class="stat">Trống <strong>{{ emptyCount }}</strong></div>
-    <div class="stat">Đã đặt <strong>{{ reservedCount }}</strong></div>
-  </div>
-
-  <!-- HIỂN THỊ THEO NHÓM -->
-  <div *ngFor="let group of groups" class="group-block">
-    <h3>{{ group.name }}</h3>
-
-    <div class="table-grid">
-      <div
-        class="table-card"
-        *ngFor="let t of group.tables"
-        (click)="openTable(t)"
-      >
-        <div class="card-header">
-          <strong>{{ t.name }}</strong>
-          <span class="dot" [ngClass]="t.status"></span>
+  <!-- Header với gradient -->
+  <header class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>
+          <svg class="icon-restaurant" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2M7 2v20M21 15V2v0a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+          </svg>
+          Quản lý bàn
+        </h1>
+        <p class="subtitle">Theo dõi và điều phối bàn ăn</p>
+      </div>
+      
+      <!-- Stats cards -->
+      <div class="stats-grid">
+        <div class="stat-card total">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Tổng bàn</span>
+            <strong class="stat-value">{{ totalTablesCount }}</strong>
+          </div>
         </div>
+        
+        <div class="stat-card serving">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Đang phục vụ</span>
+            <strong class="stat-value">{{ servingCount }}</strong>
+          </div>
+        </div>
+        
+        <div class="stat-card empty">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+              <line x1="12" y1="11" x2="12" y2="11"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Bàn trống</span>
+            <strong class="stat-value">{{ emptyCount }}</strong>
+          </div>
+        </div>
+        
+        <div class="stat-card reserved">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Đã đặt trước</span>
+            <strong class="stat-value">{{ reservedCount }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
 
-        <p>Sức chứa: {{ t.capacity }} người</p>
-
-        <span class="badge" [ngClass]="t.status">
-          {{ getStatusText(t.status) }}
-        </span>
-
-        <button
-          *ngIf="t.status === 'empty'"
-          (click)="openTable(t); $event.stopPropagation()">
-          Mở bàn
-        </button>
-
-        <button
-          *ngIf="t.status === 'reserved'"
-          (click)="confirmReserved(t); $event.stopPropagation()">
-          Xác nhận khách tới
+  <!-- Controls section -->
+  <section class="controls-section">
+    <div class="control-card">
+      <div class="control-header">
+        <svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M12 2v20M2 12h20"/>
+        </svg>
+        <span>Thêm nhóm mới</span>
+      </div>
+      <div class="input-group">
+        <input [(ngModel)]="newGroupName" placeholder="Nhập tên nhóm..." class="modern-input">
+        <button (click)="createGroup()" class="btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          Tạo nhóm
         </button>
       </div>
     </div>
-  </div>
+    
+    <div class="control-card filter-card">
+      <div class="control-header">
+        <svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        <span>Lọc theo nhóm</span>
+      </div>
+      <select [(ngModel)]="selectedGroupId" (ngModelChange)="onGroupChange($event)" class="modern-select">
+        <option [value]="0">📋 Tất cả các bàn</option>
+        <option *ngFor="let g of groups" [value]="g.id">🏷️ {{ g.name }}</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- Groups and tables -->
+  <section *ngFor="let g of visibleGroups; trackBy: trackByGroupId" class="group-container">
+    <div class="group-header">
+      <div class="group-title">
+        <div class="group-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+          </svg>
+        </div>
+        <h2>{{ g.name }}</h2>
+        <span class="table-count">{{ g.tables.length }} bàn</span>
+      </div>
+      
+      <div class="add-table-section">
+        <input [(ngModel)]="newTableName" placeholder="Tên bàn mới..." class="table-input">
+        <button (click)="createTable(g.id)" class="btn-add-table">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          Thêm bàn
+        </button>
+      </div>
+    </div>
+
+    <div class="tables-grid">
+      <div class="table-card" *ngFor="let t of g.tables" (click)="openTable(t)" [attr.data-status]="t.status">
+        <div class="table-card-inner">
+          <div class="table-status-badge" [attr.data-status]="t.status">
+            <span class="status-dot"></span>
+            <span class="status-text">{{ getStatusText(t.status) }}</span>
+          </div>
+          
+          <div class="table-icon-wrapper">
+            <svg class="table-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <line x1="9" y1="9" x2="15" y2="9"/>
+              <line x1="9" y1="15" x2="15" y2="15"/>
+            </svg>
+          </div>
+          
+          <h3 class="table-name">{{ t.name }}</h3>
+          
+          <div class="table-actions">
+            <button *ngIf="t.status === 'empty'" (click)="openTable(t); $event.stopPropagation()" class="btn-action empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M3 12h12"/>
+              </svg>
+              Mở bàn
+            </button>
+            
+            <button *ngIf="t.status === 'reserved'" (click)="confirmReserved(t); $event.stopPropagation()" class="btn-action reserved">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Xác nhận đặt bàn
+            </button>
+            
+            <button *ngIf="t.status === 'serving'" (click)="openTable(t); $event.stopPropagation()" class="btn-action serving">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              Xem chi tiết
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>

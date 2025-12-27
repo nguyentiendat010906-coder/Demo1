@@ -1,46 +1,154 @@
 <div class="layout">
+
   <!-- SIDEBAR -->
-  <aside
-    class="sidebar"
-    *ngIf="router.url !== '/login' && router.url !== '/register'"
-  >
+  <aside class="sidebar">
+
     <div class="brand">
-      <div class="logo">AC</div>
-      <div>
-        <h3>ACMAN BAR</h3>
-        <p>Hệ thống quản lý</p>
-      </div>
+      <img
+        class="brand-logo"
+        src="https://shop.acman.vn/assets/images/logo-no-bg1.png"
+        alt="ACMAN"
+      />
     </div>
 
     <ul class="menu">
-      <li routerLink="/tables" routerLinkActive="active">🍸 Phòng - Bàn</li>
-      <li routerLink="/overview" routerLinkActive="active">📊 Tổng quan</li>
-      <li routerLink="/products" routerLinkActive="active">🍹 Sản phẩm</li>
-      <li routerLink="/customers" routerLinkActive="active">👤 Khách hàng</li>
-      <li routerLink="/invoices" routerLinkActive="active">🧾 Hóa đơn</li>
+
+      <li class="menu-item" routerLink="/overview" routerLinkActive="active">
+        <i class="bi bi-grid"></i>
+        <span>Tổng quan</span>
+      </li>
+
+      <li class="menu-section">
+        <div class="section-title">
+          <i class="bi bi-cart-check"></i>
+          <span>Bán hàng</span>
+        </div>
+        <ul class="section-items">
+          <li routerLink="/tables" routerLinkActive="active">
+            <i class="bi bi-cup-straw"></i>
+            <span>Phòng - Bàn</span>
+          </li>
+          <li routerLink="/invoices" routerLinkActive="active">
+            <i class="bi bi-receipt"></i>
+            <span>Quản lý hóa đơn</span>
+          </li>
+        </ul>
+      </li>
+
+      <li class="menu-section">
+        <div class="section-title">
+          <i class="bi bi-boxes"></i>
+          <span>Danh mục</span>
+        </div>
+        <ul class="section-items">
+          <li routerLink="/customers" routerLinkActive="active">
+            <i class="bi bi-people"></i>
+            <span>Khách hàng</span>
+          </li>
+          <li routerLink="/products" routerLinkActive="active">
+            <i class="bi bi-box-seam"></i>
+            <span>Hàng hóa, dịch vụ</span>
+          </li>
+        </ul>
+      </li>
+
+      <li class="menu-section">
+        <div class="section-title">
+          <i class="bi bi-bar-chart-line"></i>
+          <span>Báo cáo</span>
+        </div>
+        <ul class="section-items">
+          <li routerLink="/reports/revenue" routerLinkActive="active">
+            <i class="bi bi-cash-coin"></i>
+            <span>Báo cáo doanh thu</span>
+          </li>
+        </ul>
+      </li>
+
+      <li class="menu-section">
+        <div class="section-title">
+          <i class="bi bi-gear"></i>
+          <span>Hệ thống</span>
+        </div>
+        <ul class="section-items">
+          <li routerLink="/system/company" routerLinkActive="active">
+            <i class="bi bi-building"></i>
+            <span>Thông tin đơn vị</span>
+          </li>
+          <li routerLink="/system/roles" routerLinkActive="active">
+            <i class="bi bi-shield-lock"></i>
+            <span>Quản lý phân quyền</span>
+          </li>
+          <li routerLink="/system/users" routerLinkActive="active">
+            <i class="bi bi-person-badge"></i>
+            <span>Quản lý users</span>
+          </li>
+        </ul>
+      </li>
+
+      <li class="menu-section">
+        <div class="section-title">
+          <i class="bi bi-sliders"></i>
+          <span>Thiết lập</span>
+        </div>
+        <ul class="section-items">
+          <li routerLink="/system/templates" routerLinkActive="active">
+            <i class="bi bi-printer"></i>
+            <span>Mẫu in bill / báo cáo</span>
+          </li>
+        </ul>
+      </li>
+
     </ul>
 
+    <!-- LOGOUT -->
     <button class="logout" (click)="logout()">Đăng xuất</button>
+
   </aside>
 
   <!-- MAIN -->
   <div class="main">
-    <!-- TOP BAR -->
-    <header class="topbar">
+
+    <!-- TOPBAR -->
+    <header
+      class="topbar"
+      *ngIf="router.url !== '/login' && router.url !== '/register'"
+    >
       <div class="company">
         0104908371 - CÔNG TY CỔ PHẦN PHÁT TRIỂN CÔNG NGHỆ ACMAN
       </div>
 
       <div class="topbar-right">
         <span class="user">ADMIN</span>
-        <span class="flag">🇻🇳</span>
-        <span class="icon">🔔</span>
+
+       <div class="lang-dropdown" (click)="toggleLang()">
+  <img
+    src="https://flagcdn.com/w40/vn.png"
+    class="flag-icon"
+    alt="VN"
+  />
+
+  <div class="lang-menu" *ngIf="showLang">
+    Vietnamese
+  </div>
+</div>
+
+        <span class="icon-bell">
+          <i class="bi bi-bell"></i>
+        </span>
+
+        <div class="user-avatar-circle">
+          <img
+            src="https://acman.vn/wp-content/uploads/2023/12/Logo-acman-Favicon.png"
+          />
+        </div>
       </div>
     </header>
 
-    <!-- PAGE CONTENT -->
+    <!-- CONTENT -->
     <main class="content">
       <router-outlet></router-outlet>
     </main>
+
   </div>
 </div>

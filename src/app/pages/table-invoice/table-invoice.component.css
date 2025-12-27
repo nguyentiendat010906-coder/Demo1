@@ -1,8 +1,15 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 /* ===== LAYOUT ===== */
 .pos-layout {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: 24px;
+  padding: 16px;
 }
 
 /* ===== PANEL ===== */
@@ -11,11 +18,19 @@
   background: #fff;
   border-radius: 12px;
   padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
 /* ===== MENU ===== */
 .panel-title {
   margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.menu-list {
+  max-height: 500px;   /* scroll nếu menu dài */
+  overflow-y: auto;
 }
 
 .menu-item {
@@ -32,19 +47,19 @@
 
 .menu-price {
   font-weight: 600;
+  color: #2563eb;
 }
 
 /* ===== INVOICE HEADER ===== */
 .invoice-header {
   display: flex;
   justify-content: space-between;
-  align-items: center; /* 🔥 QUAN TRỌNG */
+  align-items: center;
   padding-bottom: 12px;
   border-bottom: 1px solid #eee;
   margin-bottom: 12px;
 }
 
-/* LEFT */
 .header-left h3 {
   margin: 0;
   font-size: 18px;
@@ -56,12 +71,11 @@
   margin-top: 2px;
 }
 
-/* RIGHT */
 .header-right {
   text-align: right;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* 🔥 ép xuống ngang hàng */
+  justify-content: center;
   gap: 6px;
 }
 
@@ -70,23 +84,23 @@
   color: #666;
 }
 
-/* TỔNG TIỀN */
 .grand-total {
   font-size: 22px;
   font-weight: bold;
   color: #2563eb;
 }
 
-
 /* ===== ITEMS ===== */
 .invoice-items {
   border-top: 1px solid #eee;
   margin-top: 12px;
+  max-height: 400px;   /* scroll nếu nhiều item */
+  overflow-y: auto;
 }
 
 .item-row {
   display: grid;
-  grid-template-columns: 1fr 70px 120px 30px;
+  grid-template-columns: 1fr 100px 120px 30px;
   align-items: center;
   gap: 8px;
   padding: 10px 0;
@@ -97,9 +111,29 @@
   font-weight: 500;
 }
 
+.qty-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qty-control button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.qty-control button:hover {
+  background: #e5e7eb;
+}
+
 .qty {
-  width: 60px;
-  padding: 4px;
+  min-width: 24px;
+  text-align: center;
+  font-weight: 600;
 }
 
 .item-price {
@@ -112,6 +146,7 @@
   background: transparent;
   color: red;
   cursor: pointer;
+  font-size: 18px;
 }
 
 /* ===== SUMMARY ===== */
@@ -140,4 +175,25 @@
   font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
+}
+
+.pay:hover:enabled {
+  background: #15803d;
+}
+
+.pay:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .pos-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .menu-panel,
+  .invoice-panel {
+    padding: 12px;
+  }
 }

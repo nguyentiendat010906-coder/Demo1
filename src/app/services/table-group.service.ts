@@ -1,77 +1,32 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { ApiTable } from './table.service';
 
 export interface TableGroup {
-  id: string;
+  id: number;
   name: string;
-  tables: Table[];
+  tables: ApiTable[];
 }
 
-export interface Table {
-  id: string;
-  name: string;
-  groupId: string;
-  status: 'available' | 'occupied' | 'reserved';
-}
-
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class TableGroupService {
-  private tableGroups = new BehaviorSubject<TableGroup[]>([
-    {
-      id: '1',
-      name: 'Tầng 1',
-      tables: [
-        { id: '1-1', name: 'Bàn 1', groupId: '1', status: 'available' },
-        { id: '1-2', name: 'Bàn 2', groupId: '1', status: 'occupied' }
-      ]
-    }
-  ]);
+  private apiUrl = 'http://localhost:5054/api/TableGroups';
 
-  tableGroups$ = this.tableGroups.asObservable();
+  constructor(private http: HttpClient) {}
+
+  getGroups(): Observable<TableGroup[]> {
+    return this.http.get<TableGroup[]>(this.apiUrl);
+  }
 
   addGroup(name: string) {
-    const newGroup: TableGroup = {
-      id: Date.now().toString(),
-      name,
-      tables: []
-    };
-    this.tableGroups.next([...this.tableGroups.value, newGroup]);
+    return this.http.post<TableGroup>(this.apiUrl, { name });
   }
 
-  addTable(groupId: string, tableName: string) {
-    const groups = this.tableGroups.value.map(group => {
-      if (group.id === groupId) {
-        const newTable: Table = {
-          id: `${groupId}-${Date.now()}`,
-          name: tableName,
-          groupId,
-          status: 'available'
-        };
-        return { ...group, tables: [...group.tables, newTable] };
-      }
-      return group;
-    });
-    this.tableGroups.next(groups);
-  }
-
-  deleteGroup(groupId: string) {
-    this.tableGroups.next(
-      this.tableGroups.value.filter(g => g.id !== groupId)
+  addTable(groupId: number, name: string, capacity = 4) {
+    return this.http.post<ApiTable>(
+      `${this.apiUrl}/${groupId}/tables`,
+      { name, capacity }
     );
-  }
-
-  deleteTable(groupId: string, tableId: string) {
-    const groups = this.tableGroups.value.map(group => {
-      if (group.id === groupId) {
-        return {
-          ...group,
-          tables: group.tables.filter(t => t.id !== tableId)
-        };
-      }
-      return group;
-    });
-    this.tableGroups.next(groups);
   }
 }

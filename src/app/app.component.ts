@@ -12,6 +12,13 @@ import { RouterModule, Router } from '@angular/router';
 export class AppComponent {
   constructor(public router: Router) {}
 
+  showLang = false;
+
+toggleLang() {
+  this.showLang = !this.showLang;
+}
+
+
   logout() {
     localStorage.removeItem('loggedIn');
     this.router.navigate(['/login']);

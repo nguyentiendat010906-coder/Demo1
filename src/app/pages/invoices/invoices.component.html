@@ -1,99 +1,150 @@
-<div class="search-input">
-  <svg class="icon" viewBox="0 0 24 24">
-    <circle cx="11" cy="11" r="7"></circle>
-    <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
-  </svg>
-  <input type="text" placeholder="Tìm kiếm khách hàng..." />
+<div class="invoices-page">
+  <h2 class="title">Danh sách hóa đơn</h2>
+
+  <div *ngIf="invoices.length === 0" class="empty-state">
+    Chưa có hóa đơn nào
+  </div>
+
+  <table class="invoice-table" *ngIf="invoices.length > 0">
+    <thead>
+      <tr>
+        <th>Mã</th>
+        <th>Bàn</th>
+        <th>Ngày</th>
+        <th>Trạng thái</th>
+        <th>Tổng tiền</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let invoice of invoices">
+        <td><strong>#{{ invoice.id }}</strong></td>
+        <td>{{ invoice.tableName }}</td>
+        <td>{{ invoice.invoiceDate | date:'dd/MM/yyyy' }}</td>
+        <td>
+          <span class="status" [ngClass]="{
+            'status-paid': invoice.status === 'paid',
+            'status-open': invoice.status !== 'paid'
+          }">
+            {{ invoice.status === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
+          </span>
+        </td>
+        <td><strong>{{ invoice.totalAmount | number:'1.0-0' }} đ</strong></td>
+        <td>
+          <button class="btn-view" (click)="viewDetail(invoice.id)">
+            👁️ Xem
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
-<h2 class="title">Danh sách hóa đơn</h2>
 
-<table class="invoice-table">
-  <thead>
-    <tr>
-      <th>Mã</th>
-      <th>Khách hàng</th>
-      <th>Ngày</th>
-      <th>Trạng thái</th>
-      <th>Tổng tiền</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let i of invoices">
-      <td>#{{ i.id }}</td>
-      <td>{{ i.customerName }}</td>
-      <td>{{ i.invoiceDate | date:'dd/MM/yyyy' }}</td>
-     <td>
-  <span
-    class="status paid"
-    *ngIf="i.status === 'Đã thanh toán'">
-    {{ i.status }}
-  </span>
-
-  <span
-    class="status unpaid"
-    *ngIf="i.status === 'Chưa thanh toán'">
-    {{ i.status }}
-  </span>
-</td>
-
-      <td>{{ i.totalAmount | number }} đ</td>
-      <td>
-        <button class="btn-view" (click)="viewDetail(i.id)">Xem</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<!-- MODAL -->
-<div class="modal-backdrop" *ngIf="selectedInvoice">
-  <div class="modal">
-
-    <h3>Chi tiết hóa đơn #{{ selectedInvoice.id }}</h3>
-
-    <div class="info">
-       <p><b>Khách hàng:</b> {{ selectedInvoice.customer.name }}</p>
-  <p><b>Số điện thoại:</b> {{ selectedInvoice.customer.phone }}</p>
-  <p><b>Địa chỉ:</b> {{ selectedInvoice.customer.address }}</p>
-  <p><b>Ngày lập:</b> {{ selectedInvoice.invoiceDate | date:'dd/MM/yyyy' }}</p>
-  <p>
-  <b>Trạng thái:</b>
-  <span
-    class="status"
-    [ngClass]="{
-      paid: selectedInvoice.status === 'PAID',
-      unpaid: selectedInvoice.status === 'PENDING'
-    }"
-  >
-    {{ selectedInvoice.status === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
-  </span>
-</p>
-
+<!-- MODAL CHI TIẾT -->
+<div class="modal-backdrop" *ngIf="selectedInvoice" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h3>Chi tiết hóa đơn #{{ selectedInvoice.id }}</h3>
+      <button class="btn-close" (click)="closeModal()">✖</button>
     </div>
 
-    <table class="detail-table" *ngIf="selectedInvoice.invoiceDetails?.length">
-      <thead>
-        <tr>
-          <th>Sản phẩm</th>
-          <th>SL</th>
-          <th>Đơn giá</th>
-          <th>Thành tiền</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let d of selectedInvoice.invoiceDetails">
-          <td>{{ d.productName }}</td>
-          <td>{{ d.quantity }}</td>
-          <td>{{ d.unitPrice | number }} đ</td>
-          <td>{{ d.quantity * d.unitPrice | number }} đ</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="modal-body">
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Bàn:</span>
+          <span class="value">{{ selectedInvoice.tableName }}</span>
+        </div>
 
-    <div class="total">
-      Tổng tiền: {{ selectedInvoice.totalAmount | number }} đ
+        <div class="info-item">
+          <span class="label">Nhóm:</span>
+          <span class="value">{{ selectedInvoice.groupName }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="label">Thu ngân:</span>
+          <span class="value">{{ selectedInvoice.cashierName }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="label">Ngày:</span>
+          <span class="value">
+            {{ selectedInvoice.invoiceDate | date:'dd/MM/yyyy' }}
+          </span>
+        </div>
+
+        <div class="info-item">
+          <span class="label">Giờ bắt đầu:</span>
+          <span class="value">
+            {{ selectedInvoice.invoiceDate | date:'HH:mm' }}
+          </span>
+        </div>
+
+        <div class="info-item">
+          <span class="label">Giờ kết thúc:</span>
+          <span class="value">
+            {{ selectedInvoice.endTime ? (selectedInvoice.endTime | date:'HH:mm') : '—' }}
+          </span>
+        </div>
+
+        <div class="info-item">
+          <span class="label">Thời gian phục vụ:</span>
+          <span class="value">
+            {{ formatServiceTime(selectedInvoice.serviceHours) }}
+          </span>
+        </div>
+
+        <div class="info-item">
+          <span class="label">Trạng thái:</span>
+          <span class="status"
+            [ngClass]="{
+              'status-paid': selectedInvoice.status === 'paid',
+              'status-open': selectedInvoice.status !== 'paid'
+            }">
+            {{ selectedInvoice.status === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
+          </span>
+        </div>
+      </div>
+
+      <h4>Chi tiết món</h4>
+      <table class="detail-table" *ngIf="selectedInvoice.invoiceDetails?.length">
+        <thead>
+          <tr>
+            <th>Sản phẩm</th>
+            <th>SL</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of selectedInvoice.invoiceDetails">
+            <td>{{ item.productName }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.unitPrice | number:'1.0-0' }} đ</td>
+            <td><strong>{{ item.quantity * item.unitPrice | number:'1.0-0' }} đ</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="!selectedInvoice.invoiceDetails || selectedInvoice.invoiceDetails.length === 0" 
+           class="empty-state-items">
+        Không có món nào
+      </div>
+
+      <div class="total-section">
+        <div class="total-row">
+          <span>Tạm tính</span>
+          <span>{{ selectedInvoice.subtotal | number:'1.0-0' }} đ</span>
+        </div>
+        <div class="total-row">
+          <span>VAT (10%)</span>
+          <span>{{ selectedInvoice.vatAmount | number:'1.0-0' }} đ</span>
+        </div>
+        <div class="total-row total-final">
+          <strong>Tổng tiền</strong>
+          <strong class="total-amount">{{ selectedInvoice.totalAmount | number:'1.0-0' }} đ</strong>
+        </div>
+      </div>
     </div>
-
-    <button class="btn-close" (click)="closeModal()">Đóng</button>
   </div>
 </div>

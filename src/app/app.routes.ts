@@ -6,13 +6,13 @@ import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { InvoicesComponent } from './pages/invoices/invoices.component';  
 import { TablesComponent } from './pages/tables/tables.component';
-import { TableGroupsComponent } from './pages/table-groups/table-groups.component';
 
 
 
+
+// ✅ Sửa lại app.routes.ts
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: 'table-groups', component: TableGroupsComponent },
 
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
@@ -22,12 +22,13 @@ export const routes: Routes = [
   { path: 'customers', component: CustomersComponent },
   { path: 'invoices', component: InvoicesComponent },
   { path: 'tables', component: TablesComponent },
-  // app.routes.ts hoặc app-routing.module.ts
-{
-  path: 'tables/:tableId/invoice',
-  loadComponent: () =>
-    import('./pages/table-invoice/table-invoice.component')
-      .then(m => m.TableInvoiceComponent)
-}
-
+  
+  
+  // ✅ Đổi :tableId → :id
+  {
+    path: 'tables/:id/invoice',
+    loadComponent: () =>
+      import('./pages/table-invoice/table-invoice.component')
+        .then(m => m.TableInvoiceComponent)
+  }
 ];
