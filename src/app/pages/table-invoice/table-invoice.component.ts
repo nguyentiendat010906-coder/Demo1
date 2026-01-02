@@ -39,10 +39,20 @@ export class TableInvoiceComponent implements OnInit {
   startTime = new Date();
 
   menu: Product[] = [];
+  filteredMenu: Product[] = [];
   items: InvoiceItem[] = [];
   discount = 0;
 
   invoiceId: number | null = null;
+
+  // Filter controls
+  selectedCategory = 'all';
+  searchText = '';
+  categories: string[] = [];
+
+  // Customer info
+  customerName = '';
+  customerPhone = '';
 
   constructor(
     private productService: ProductService,
@@ -79,35 +89,57 @@ export class TableInvoiceComponent implements OnInit {
         this.menu = products.filter(p =>
           p.unitType === 'Thời gian' || (p.stock ?? 0) > 0
         );
+        
+        // Extract unique categories
+        this.categories = ['all', ...new Set(this.menu.map(p => p.category))];
+        
+        this.filteredMenu = this.menu;
         console.log('✅ Menu loaded:', this.menu);
+        console.log('✅ Categories:', this.categories);
       }
     });
   }
 
-  // ===== INIT INVOICE =====
-initInvoice() {
-  // thử lấy hóa đơn đang mở trước
-  this.invoiceService.getInvoiceByTable(this.tableId).subscribe({
-    next: (invoice) => {
-      this.invoiceId = invoice.id;
-      this.startTime = new Date(invoice.invoiceDate);
-      console.log('✅ Existing invoice loaded:', invoice);
-      this.loadInvoiceItems();
-    },
-    error: () => {
-      // nếu chưa có thì tạo mới
-      this.invoiceService.createInvoiceForTable(this.tableId).subscribe({
-        next: (invoice) => {
-          this.invoiceId = invoice.id;
-          this.startTime = new Date(invoice.invoiceDate);
-          console.log('✅ New invoice created:', invoice);
-          this.loadInvoiceItems();
-        }
-      });
-    }
-  });
-}
+  // ===== FILTER MENU =====
+  filterMenu() {
+    this.filteredMenu = this.menu.filter(p => {
+      const matchCategory = this.selectedCategory === 'all' || p.category === this.selectedCategory;
+      const matchSearch = p.name.toLowerCase().includes(this.searchText.toLowerCase());
+      return matchCategory && matchSearch;
+    });
+  }
 
+  onCategoryChange() {
+    this.filterMenu();
+  }
+
+  onSearchChange() {
+    this.filterMenu();
+  }
+
+  // ===== INIT INVOICE =====
+  initInvoice() {
+    this.invoiceService.getInvoiceByTable(this.tableId).subscribe({
+      next: (invoice) => {
+        this.invoiceId = invoice.id;
+        this.startTime = new Date(invoice.invoiceDate);
+        this.customerName = invoice.customerName || '';
+        this.customerPhone = invoice.customerPhone || '';
+        console.log('✅ Existing invoice loaded:', invoice);
+        this.loadInvoiceItems();
+      },
+      error: () => {
+        this.invoiceService.createInvoiceForTable(this.tableId).subscribe({
+          next: (invoice) => {
+            this.invoiceId = invoice.id;
+            this.startTime = new Date(invoice.invoiceDate);
+            console.log('✅ New invoice created:', invoice);
+            this.loadInvoiceItems();
+          }
+        });
+      }
+    });
+  }
 
   // ===== LOAD ITEMS =====
   loadInvoiceItems() {
@@ -120,28 +152,39 @@ initInvoice() {
     });
   }
 
+  // ===== UPDATE CUSTOMER INFO =====
+  updateCustomerInfo() {
+    if (!this.invoiceId) return;
+    
+    console.log('Updating customer info:', { customerName: this.customerName, customerPhone: this.customerPhone });
+    
+    // Nếu API có endpoint để update customer info, gọi tại đây
+    // this.invoiceService.updateInvoiceCustomer(this.invoiceId, {
+    //   customerName: this.customerName,
+    //   customerPhone: this.customerPhone
+    // }).subscribe({
+    //   next: () => console.log('✅ Customer info updated')
+    // });
+  }
+
   // ===== POS CORE =====
   addItem(p: Product) {
-  if (!this.invoiceId) return;
+    if (!this.invoiceId) return;
 
-  // Tìm xem món đã có trong hóa đơn chưa
-  const existing = this.items.find(x => x.productId === p.id);
+    const existing = this.items.find(x => x.productId === p.id);
 
-  if (existing) {
-    // ✅ tăng số lượng
-    const dto = { productId: existing.productId, quantity: existing.quantity + 1, unitPrice: existing.unitPrice };
-    this.invoiceService.updateInvoiceItem(this.invoiceId, existing.id, dto).subscribe({
-      next: () => this.loadInvoiceItems()
-    });
-  } else {
-    // thêm mới
-    const itemDto = { productId: p.id, quantity: 1, unitPrice: p.price };
-    this.invoiceService.addInvoiceItem(this.invoiceId, itemDto).subscribe({
-      next: () => this.loadInvoiceItems()
-    });
+    if (existing) {
+      const dto = { productId: existing.productId, quantity: existing.quantity + 1, unitPrice: existing.unitPrice };
+      this.invoiceService.updateInvoiceItem(this.invoiceId, existing.id, dto).subscribe({
+        next: () => this.loadInvoiceItems()
+      });
+    } else {
+      const itemDto = { productId: p.id, quantity: 1, unitPrice: p.price };
+      this.invoiceService.addInvoiceItem(this.invoiceId, itemDto).subscribe({
+        next: () => this.loadInvoiceItems()
+      });
+    }
   }
-}
-
 
   increase(i: InvoiceItem) {
     if (!this.invoiceId) return;
@@ -185,23 +228,21 @@ initInvoice() {
   }
 
   // ===== CHECKOUT =====
-  // ===== CHECKOUT =====
-saveInvoice() {
-  if (!this.invoiceId) return;
-  
-  // Cập nhật endTime trước khi checkout
-  const endTime = new Date();
-  
-  this.invoiceService.checkout(this.invoiceId, endTime).subscribe({
-    next: () => {
-      console.log('✅ Invoice checked out');
-      alert('Thanh toán thành công!');
-      this.router.navigate(['/invoices']);
-    },
-    error: (err) => {
-      console.error('❌ Error saving invoice:', err);
-      alert('Có lỗi khi lưu hóa đơn');
-    }
-  });
-}
+  saveInvoice() {
+    if (!this.invoiceId) return;
+    
+    const endTime = new Date();
+    
+    this.invoiceService.checkout(this.invoiceId, endTime).subscribe({
+      next: () => {
+        console.log('✅ Invoice checked out');
+        alert('Thanh toán thành công!');
+        this.router.navigate(['/invoices']);
+      },
+      error: (err) => {
+        console.error('❌ Error saving invoice:', err);
+        alert('Có lỗi khi lưu hóa đơn');
+      }
+    });
+  }
 }

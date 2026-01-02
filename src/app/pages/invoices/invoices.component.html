@@ -10,6 +10,7 @@
       <tr>
         <th>Mã</th>
         <th>Bàn</th>
+        <th>Khách hàng</th>
         <th>Ngày</th>
         <th>Trạng thái</th>
         <th>Tổng tiền</th>
@@ -20,6 +21,7 @@
       <tr *ngFor="let invoice of invoices">
         <td><strong>#{{ invoice.id }}</strong></td>
         <td>{{ invoice.tableName }}</td>
+        <td>{{ invoice.customerName || 'Khách lẻ' }}</td>
         <td>{{ invoice.invoiceDate | date:'dd/MM/yyyy' }}</td>
         <td>
           <span class="status" [ngClass]="{
@@ -64,6 +66,21 @@
         <div class="info-item">
           <span class="label">Thu ngân:</span>
           <span class="value">{{ selectedInvoice.cashierName }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="label">Khách hàng:</span>
+          <span class="value">{{ selectedInvoice.customer?.name || 'Khách lẻ' }}</span>
+        </div>
+
+        <div class="info-item" *ngIf="selectedInvoice.customer?.phone">
+          <span class="label">Số điện thoại:</span>
+          <span class="value">{{ selectedInvoice.customer.phone }}</span>
+        </div>
+
+        <div class="info-item" *ngIf="selectedInvoice.customer?.address">
+          <span class="label">Địa chỉ:</span>
+          <span class="value">{{ selectedInvoice.customer.address }}</span>
         </div>
 
         <div class="info-item">

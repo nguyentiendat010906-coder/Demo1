@@ -3,12 +3,44 @@
   <!-- MENU -->
   <div class="menu-panel">
     <h3 class="panel-title">Menu</h3>
+    
+    <!-- FILTER CONTROLS -->
+    <div class="menu-filters">
+      <!-- Category Filter -->
+      <div class="filter-group">
+        <label>Nhóm món:</label>
+        <select [(ngModel)]="selectedCategory" (ngModelChange)="onCategoryChange()" class="filter-select">
+          <option value="all">🍽️ Tất cả</option>
+          <option *ngFor="let cat of categories" [value]="cat" [hidden]="cat === 'all'">
+            {{ cat === 'Bếp' ? '🍳' : cat === 'Bar' ? '🍹' : '📦' }} {{ cat }}
+          </option>
+        </select>
+      </div>
+      
+      <!-- Search -->
+      <div class="filter-group">
+        <label>Tìm kiếm:</label>
+        <input 
+          type="text" 
+          [(ngModel)]="searchText" 
+          (ngModelChange)="onSearchChange()"
+          placeholder="🔍 Nhập tên món..." 
+          class="filter-input">
+      </div>
+    </div>
+    
+    <!-- MENU LIST -->
     <div class="menu-list">
       <div class="menu-item"
-           *ngFor="let m of menu"
+           *ngFor="let m of filteredMenu"
            (click)="addItem(m)">
         <span class="menu-name">{{ m.name }}</span>
         <span class="menu-price">{{ m.price | number }} đ</span>
+      </div>
+      
+      <!-- Empty state -->
+      <div *ngIf="filteredMenu.length === 0" class="menu-empty">
+        <p>Không tìm thấy món nào</p>
       </div>
     </div>
   </div>
@@ -31,6 +63,43 @@
         </div>
         <div class="grand-total">
           {{ total | number }} đ
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMER INFO -->
+    <div class="customer-info">
+      <h4>Thông tin khách hàng</h4>
+      <div class="customer-form">
+        <div class="form-group">
+          <label>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            Tên khách hàng:
+          </label>
+          <input 
+            type="text" 
+            [(ngModel)]="customerName" 
+            (blur)="updateCustomerInfo()"
+            placeholder="Nhập tên khách hàng..." 
+            class="customer-input">
+        </div>
+        
+        <div class="form-group">
+          <label>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+            </svg>
+            Số điện thoại:
+          </label>
+          <input 
+            type="tel" 
+            [(ngModel)]="customerPhone" 
+            (blur)="updateCustomerInfo()"
+            placeholder="Nhập số điện thoại..." 
+            class="customer-input">
         </div>
       </div>
     </div>
