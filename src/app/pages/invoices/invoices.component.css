@@ -1,12 +1,21 @@
 .invoices-page {
-  padding: 20px;
-  max-width: 1400px;
+  padding: 0px;
   margin: 0 auto;
 }
 
 .title {
-  margin: 20px 0;
-  font-size: 24px;
+  display: inline-block;
+  width: 100%;
+  margin: 0;
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 400;
+  transform: translate(-20px, -20px);
+  border: 2px solid #ccc;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 4px;
+  box-shadow: inset 0 0px 600px rgba(0,0,0,0.2);
 }
 
 .empty-state {
@@ -17,12 +26,13 @@
 }
 
 .invoice-table {
-  width: 100%;
+  width: 90%;
   border-collapse: collapse;
   background: white;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-left: 70px;
 }
 
 .invoice-table thead {
@@ -37,9 +47,21 @@
   border-bottom: 2px solid #ddd;
 }
 
+.invoice-table th:last-child {
+  width: 120px;
+  min-width: 120px;
+  text-align: center;
+}
+
 .invoice-table td {
   padding: 15px;
   border-bottom: 1px solid #eee;
+}
+
+.invoice-table td:last-child {
+  width: 120px;
+  min-width: 120px;
+  text-align: center;
 }
 
 .invoice-table tbody tr:hover {
@@ -72,6 +94,8 @@
   border-radius: 6px;
   cursor: pointer;
   font-size: 13px;
+  min-width: 70px;
+  white-space: nowrap;
 }
 
 .btn-view:hover {
@@ -90,6 +114,7 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 10px;
 }
 
 .modal {
@@ -214,4 +239,332 @@
   color: #2e7d32;
   font-size: 24px;
   font-weight: bold;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Tablet (1024px and below) */
+@media (max-width: 1024px) {
+  .invoices-page {
+    padding: 15px;
+  }
+
+  .title {
+    transform: translate(0, 0);
+    margin-bottom: 20px;
+  }
+
+  .invoice-table {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* Tablet (768px and below) */
+@media (max-width: 768px) {
+  .invoices-page {
+    padding: 12px;
+  }
+
+  .title {
+    font-size: 16px;
+    padding: 8px 10px;
+    margin-bottom: 16px;
+    transform: none;
+  }
+
+  .invoice-table {
+    font-size: 13px;
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .invoice-table th,
+  .invoice-table td {
+    padding: 10px 8px;
+  }
+
+  /* Ẩn cột Khách hàng trên tablet */
+  .invoice-table th:nth-child(3),
+  .invoice-table td:nth-child(3) {
+    display: none;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .modal-header {
+    padding: 15px;
+  }
+
+  .modal-header h3 {
+    font-size: 18px;
+  }
+
+  .modal-body {
+    padding: 15px;
+  }
+
+  .detail-table {
+    font-size: 13px;
+  }
+
+  .detail-table th,
+  .detail-table td {
+    padding: 8px;
+  }
+
+  .total-section {
+    padding: 15px;
+  }
+
+  .total-row {
+    font-size: 14px;
+  }
+
+  .total-final {
+    font-size: 16px;
+  }
+
+  .total-amount {
+    font-size: 20px;
+  }
+}
+
+/* Mobile (600px and below) - KEEP TABLE LAYOUT */
+@media (max-width: 600px) {
+  .invoices-page {
+    padding: 8px;
+  }
+
+  .title {
+    font-size: 14px;
+    padding: 7px 10px;
+    margin-bottom: 12px;
+    transform: none;
+  }
+
+  .empty-state {
+    padding: 40px 15px;
+    font-size: 14px;
+  }
+
+  /* Keep table as table, fit to screen */
+  .invoice-table {
+    font-size: 11px;
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .invoice-table th,
+  .invoice-table td {
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+
+  /* Mã (#34) */
+  .invoice-table th:nth-child(1),
+  .invoice-table td:nth-child(1) {
+    padding-left: 8px;
+  }
+
+  /* Ẩn cột Khách hàng trên mobile */
+  .invoice-table th:nth-child(3),
+  .invoice-table td:nth-child(3) {
+    display: none;
+  }
+
+  /* Ẩn cột Ngày trên mobile */
+  .invoice-table th:nth-child(4),
+  .invoice-table td:nth-child(4) {
+    display: none;
+  }
+
+  /* Nút Xem */
+  .invoice-table th:nth-child(7),
+  .invoice-table td:nth-child(7) {
+    padding-right: 8px;
+    text-align: center;
+  }
+
+  .status {
+    padding: 3px 6px;
+    font-size: 10px;
+    display: inline-block;
+  }
+
+  .btn-view {
+    padding: 5px 8px;
+    font-size: 11px;
+    min-width: 50px;
+  }
+
+  /* Modal full screen on mobile */
+  .modal-backdrop {
+    padding: 0;
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-header {
+    padding: 12px 15px;
+    flex-shrink: 0;
+  }
+
+  .modal-header h3 {
+    font-size: 16px;
+  }
+
+  .modal-body {
+    padding: 15px;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .info-grid {
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .info-item .label {
+    font-size: 11px;
+  }
+
+  .info-item .value {
+    font-size: 12px;
+  }
+
+  .modal-body h4 {
+    font-size: 14px;
+    margin: 15px 0 10px;
+  }
+
+  /* Keep detail table as table in modal */
+  .detail-table {
+    font-size: 11px;
+    min-width: 100%;
+  }
+
+  .detail-table th,
+  .detail-table td {
+    padding: 6px 4px;
+  }
+
+  .empty-state-items {
+    padding: 20px 10px;
+    font-size: 12px;
+  }
+
+  .total-section {
+    padding: 12px;
+  }
+
+  .total-row {
+    font-size: 12px;
+    padding: 6px 0;
+  }
+
+  .total-final {
+    font-size: 14px;
+    padding-top: 10px;
+  }
+
+  .total-amount {
+    font-size: 16px;
+  }
+}
+
+/* Small mobile (400px and below) - STILL KEEP TABLE LAYOUT */
+@media (max-width: 400px) {
+  .invoices-page {
+    padding: 5px;
+  }
+
+  .title {
+    font-size: 13px;
+    padding: 6px 8px;
+    transform: none;
+  }
+
+  .invoice-table {
+    font-size: 10px;
+  }
+
+  .invoice-table th,
+  .invoice-table td {
+    padding: 6px 3px;
+    font-size: 10px;
+  }
+
+  .invoice-table th:nth-child(1),
+  .invoice-table td:nth-child(1) {
+    padding-left: 6px;
+  }
+
+  .invoice-table th:nth-child(7),
+  .invoice-table td:nth-child(7) {
+    padding-right: 6px;
+  }
+
+  .status {
+    padding: 2px 5px;
+    font-size: 9px;
+  }
+
+  .btn-view {
+    padding: 4px 6px;
+    font-size: 10px;
+    min-width: 45px;
+  }
+
+  .modal-header {
+    padding: 10px 12px;
+  }
+
+  .modal-header h3 {
+    font-size: 14px;
+  }
+
+  .modal-body {
+    padding: 12px;
+  }
+
+  .info-item .label {
+    font-size: 10px;
+  }
+
+  .info-item .value {
+    font-size: 11px;
+  }
+
+  .detail-table {
+    font-size: 10px;
+  }
+
+  .detail-table th,
+  .detail-table td {
+    padding: 5px 3px;
+  }
+
+  .total-section {
+    padding: 10px;
+  }
+
+  .total-row {
+    font-size: 11px;
+  }
+
+  .total-amount {
+    font-size: 14px;
+  }
 }

@@ -14,4 +14,12 @@ export class CustomerService {
   getAllCustomers(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
   }
+  updateCustomer(id: number, customer: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, customer);
+  }
+
+  // ✅ THÊM METHOD NÀY
+  deleteCustomer(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+  }
 }

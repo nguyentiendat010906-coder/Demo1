@@ -38,6 +38,10 @@ export class TablesComponent implements OnInit {
   newGroupName = '';
   newTableName = '';
 
+  // Thêm biến cho dialog xác nhận
+  showConfirmDialog = false;
+  pendingTable: ExtendedApiTable | null = null;
+
   constructor(
     private tableService: TableService,
     private tableGroupService: TableGroupService,
@@ -90,7 +94,9 @@ export class TablesComponent implements OnInit {
                       totalAmount: total,
                       serviceMinutes: Math.floor(
                         (Date.now() - new Date(invoice.invoiceDate).getTime()) / 60000
-                      )
+                      ),
+                      customerName: invoice.customerName || '',
+                      customerPhone: invoice.customerPhone || ''
                     };
                   }),
                   catchError(() => of(null))
@@ -125,7 +131,9 @@ export class TablesComponent implements OnInit {
                       invoiceId: invoiceInfo.invoiceId,
                       startDate: invoiceInfo.startDate,
                       totalAmount: invoiceInfo.totalAmount,
-                      serviceMinutes: invoiceInfo.serviceMinutes
+                      serviceMinutes: invoiceInfo.serviceMinutes,
+                      customerName: invoiceInfo.customerName,
+                      customerPhone: invoiceInfo.customerPhone
                     };
                   }
                   
@@ -194,12 +202,28 @@ export class TablesComponent implements OnInit {
   // Click vào bàn - Xử lý theo từng trạng thái
   openTable(table: ExtendedApiTable) {
     if (table.status === 'empty') {
-      this.createNewInvoice(table);
+      // Hiển thị dialog xác nhận
+      this.pendingTable = table;
+      this.showConfirmDialog = true;
     } else if (table.status === 'serving') {
       this.viewCurrentInvoice(table);
     } else if (table.status === 'reserved') {
       alert('Bàn này đã được đặt trước. Nhấn "Xác nhận khách tới" để bắt đầu phục vụ.');
     }
+  }
+
+  // Xác nhận mở bàn
+  confirmOpenTable() {
+    if (this.pendingTable) {
+      this.createNewInvoice(this.pendingTable);
+      this.closeConfirmDialog();
+    }
+  }
+
+  // Hủy mở bàn
+  closeConfirmDialog() {
+    this.showConfirmDialog = false;
+    this.pendingTable = null;
   }
 
   createNewInvoice(table: ExtendedApiTable) {
@@ -235,38 +259,6 @@ export class TablesComponent implements OnInit {
       error: (err) => {
         console.error('❌ Error confirming table:', err);
         alert('Không thể xác nhận bàn!');
-      }
-    });
-  }
-
-  createGroup() {
-    if (!this.newGroupName.trim()) return;
-    
-    this.tableGroupService.addGroup(this.newGroupName).subscribe({
-      next: () => {
-        console.log('✅ Group created');
-        this.newGroupName = '';
-        this.loadData();
-      },
-      error: (err) => {
-        console.error('❌ Error creating group:', err);
-        alert('Không thể tạo nhóm!');
-      }
-    });
-  }
-
-  createTable(groupId: number) {
-    if (!this.newTableName.trim()) return;
-    
-    this.tableGroupService.addTable(groupId, this.newTableName).subscribe({
-      next: () => {
-        console.log('✅ Table created');
-        this.newTableName = '';
-        this.loadData();
-      },
-      error: (err) => {
-        console.error('❌ Error creating table:', err);
-        alert('Không thể tạo bàn!');
       }
     });
   }

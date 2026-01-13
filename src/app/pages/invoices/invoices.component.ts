@@ -54,6 +54,7 @@ export class InvoicesComponent implements OnInit {
           tableName: data.tableName || '—',
           groupName: data.groupName || '—',
           cashierName: data.cashierName || 'ADMIN',
+          customerName:data.customerName,
           invoiceDate: startTime,
           endTime: endTime,
           serviceHours: serviceHours,

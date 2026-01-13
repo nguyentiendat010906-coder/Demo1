@@ -1,7 +1,7 @@
+<div class="customer-page">
 <h2 class="title">Khách hàng</h2>
+
 <!-- SEARCH BAR -->
-
-
 <div class="search-input">
   <svg class="icon" viewBox="0 0 24 24">
     <circle cx="11" cy="11" r="7"></circle>
@@ -10,8 +10,6 @@
   <input type="text" placeholder="Tìm kiếm khách hàng..." />
 </div>
 
-
-
 <div class="table-wrapper" *ngIf="customers.length; else empty">
   <table>
     <thead>
@@ -19,6 +17,7 @@
         <th>Tên khách hàng</th>
         <th>Số điện thoại</th>
         <th>Địa chỉ</th>
+        <th>Thao tác</th>
       </tr>
     </thead>
 
@@ -27,6 +26,9 @@
         <td>{{ c.name }}</td>
         <td>{{ c.phone }}</td>
         <td>{{ c.address || '—' }}</td>
+        <td>
+          <button class="btn-view" (click)="viewDetail(c)">👁️ Xem</button>
+        </td>
       </tr>
     </tbody>
   </table>
@@ -35,3 +37,106 @@
 <ng-template #empty>
   <p class="empty">Chưa có khách hàng</p>
 </ng-template>
+
+<!-- ===================== CUSTOMER MODAL - EDIT MODE ONLY ===================== -->
+<div class="modal-overlay" *ngIf="selectedCustomer" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h3>👤 Chỉnh sửa thông tin</h3>
+      <button class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+    
+    <!-- Modal Body - FORM EDIT -->
+    <div class="modal-body">
+      <form class="modal-form">
+        
+        <!-- Row 1: Họ tên & Số điện thoại -->
+        <div class="form-row">
+          <div class="form-field">
+            <label>
+              Họ và tên <span class="required">*</span>
+            </label>
+            <input 
+              type="text" 
+              [(ngModel)]="selectedCustomer.name"
+              name="customerName"
+              placeholder="Nhập họ và tên..."
+              required>
+          </div>
+          
+          <div class="form-field">
+            <label>
+              Số điện thoại <span class="required">*</span>
+            </label>
+            <input 
+              type="tel" 
+              [(ngModel)]="selectedCustomer.phone"
+              name="customerPhone"
+              placeholder="Nhập số điện thoại..."
+              required>
+          </div>
+        </div>
+        
+        <!-- Row 2: Mã số thuế & Số CCCD -->
+        <div class="form-row">
+          <div class="form-field">
+            <label>Mã số thuế</label>
+            <input 
+              type="text" 
+              [(ngModel)]="selectedCustomer.taxCode"
+              name="customerTaxCode"
+              placeholder="Nhập mã số thuế...">
+          </div>
+          
+          <div class="form-field">
+            <label>Số CCCD/CMND</label>
+            <input 
+              type="text" 
+              [(ngModel)]="selectedCustomer.idCard"
+              name="customerIdCard"
+              placeholder="Nhập số CCCD/CMND...">
+          </div>
+        </div>
+        
+        <!-- Row 3: Email -->
+        <div class="form-field full-width">
+          <label>Email</label>
+          <input 
+            type="email" 
+            [(ngModel)]="selectedCustomer.email"
+            name="customerEmail"
+            placeholder="Nhập địa chỉ email...">
+        </div>
+        
+        <!-- Row 4: Địa chỉ -->
+        <div class="form-field full-width">
+          <label>Địa chỉ</label>
+          <textarea 
+            [(ngModel)]="selectedCustomer.address"
+            name="customerAddress"
+            placeholder="Nhập địa chỉ đầy đủ..."></textarea>
+        </div>
+        
+      </form>
+    </div>
+    
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="modal-btn delete" (click)="deleteCustomer()">
+        🗑️ Xóa
+      </button>
+      <div class="right-btns">
+        <button class="modal-btn cancel" (click)="closeModal()">
+          Đóng
+        </button>
+        <button class="modal-btn save" (click)="saveCustomer()">
+          💾 Lưu
+        </button>
+      </div>
+    </div>
+    
+  </div>
+</div>
+</div>

@@ -6,8 +6,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { InvoicesComponent } from './pages/invoices/invoices.component';  
 import { TablesComponent } from './pages/tables/tables.component';
-
-
+import { TableSettingComponent } from './pages/table-setting/table-setting.component';
 
 
 // ✅ Sửa lại app.routes.ts
@@ -30,5 +29,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/table-invoice/table-invoice.component')
         .then(m => m.TableInvoiceComponent)
-  }
+  },
+  {
+  path: 'table-setting',
+  loadComponent: () =>
+    import('./pages/table-setting/table-setting.component')
+      .then(m => m.TableSettingComponent)
+}
+
 ];

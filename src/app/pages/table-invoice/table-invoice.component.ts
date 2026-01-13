@@ -53,6 +53,15 @@ export class TableInvoiceComponent implements OnInit {
   // Customer info
   customerName = '';
   customerPhone = '';
+  
+  // Modal state
+  showCustomerModal = false;
+  
+  // Additional customer information
+  customerTaxCode = '';
+  customerIdCard = '';
+  customerEmail = '';
+  customerAddress = '';
 
   constructor(
     private productService: ProductService,
@@ -123,8 +132,15 @@ export class TableInvoiceComponent implements OnInit {
       next: (invoice) => {
         this.invoiceId = invoice.id;
         this.startTime = new Date(invoice.invoiceDate);
+        
+        // Load customer info from invoice
         this.customerName = invoice.customerName || '';
         this.customerPhone = invoice.customerPhone || '';
+        this.customerTaxCode = invoice.customerTaxCode || '';
+        this.customerIdCard = invoice.customerIdCard || '';
+        this.customerEmail = invoice.customerEmail || '';
+        this.customerAddress = invoice.customerAddress || '';
+        
         console.log('✅ Existing invoice loaded:', invoice);
         this.loadInvoiceItems();
       },
@@ -152,19 +168,87 @@ export class TableInvoiceComponent implements OnInit {
     });
   }
 
-  // ===== UPDATE CUSTOMER INFO =====
-  updateCustomerInfo() {
-    if (!this.invoiceId) return;
+  // ===== CUSTOMER MODAL =====
+  openCustomerModal() {
+    this.showCustomerModal = true;
+  }
+
+  closeCustomerModal() {
+    this.showCustomerModal = false;
+  }
+
+  saveCustomerInfo() {
+    // Validate required fields
+    if (!this.customerName?.trim()) {
+      alert('Vui lòng nhập họ tên khách hàng!');
+      return;
+    }
     
-    console.log('Updating customer info:', { customerName: this.customerName, customerPhone: this.customerPhone });
+    if (!this.customerPhone?.trim()) {
+      alert('Vui lòng nhập số điện thoại!');
+      return;
+    }
     
-    // Nếu API có endpoint để update customer info, gọi tại đây
-    // this.invoiceService.updateInvoiceCustomer(this.invoiceId, {
-    //   customerName: this.customerName,
-    //   customerPhone: this.customerPhone
-    // }).subscribe({
-    //   next: () => console.log('✅ Customer info updated')
-    // });
+    // Validate phone number format (10-11 digits)
+    const phoneRegex = /^[0-9]{10,11}$/;
+    if (!phoneRegex.test(this.customerPhone.replace(/\s/g, ''))) {
+      alert('Số điện thoại không hợp lệ! Vui lòng nhập 10-11 chữ số.');
+      return;
+    }
+    
+    // Validate email if provided
+    if (this.customerEmail?.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.customerEmail)) {
+        alert('Email không hợp lệ!');
+        return;
+      }
+    }
+    
+    // Validate tax code format if provided (10 or 13 digits)
+    if (this.customerTaxCode?.trim()) {
+      const taxRegex = /^[0-9]{10}$|^[0-9]{13}$/;
+      if (!taxRegex.test(this.customerTaxCode)) {
+        alert('Mã số thuế không hợp lệ! Phải là 10 hoặc 13 chữ số.');
+        return;
+      }
+    }
+    
+    // Validate ID card format if provided (9 or 12 digits)
+    if (this.customerIdCard?.trim()) {
+      const idRegex = /^[0-9]{9}$|^[0-9]{12}$/;
+      if (!idRegex.test(this.customerIdCard)) {
+        alert('Số CCCD/CMND không hợp lệ! Phải là 9 hoặc 12 chữ số.');
+        return;
+      }
+    }
+    
+    // Update customer info via API
+    if (this.invoiceId) {
+      const customerData = {
+        customerName: this.customerName,
+        customerPhone: this.customerPhone,
+        customerTaxCode: this.customerTaxCode || undefined,
+        customerIdCard: this.customerIdCard || undefined,
+        customerEmail: this.customerEmail || undefined,
+        customerAddress: this.customerAddress || undefined
+      };
+
+      this.invoiceService.updateInvoiceCustomer(this.invoiceId, customerData).subscribe({
+        next: () => {
+          console.log('✅ Customer info updated successfully');
+          this.closeCustomerModal();
+          alert('Thông tin khách hàng đã được lưu!');
+        },
+        error: (err) => {
+          console.error('❌ Error updating customer info:', err);
+          alert('Có lỗi khi cập nhật thông tin khách hàng');
+        }
+      });
+    } else {
+      console.error('❌ No invoice ID available');
+      alert('Không thể lưu thông tin khách hàng');
+    }
   }
 
   // ===== POS CORE =====

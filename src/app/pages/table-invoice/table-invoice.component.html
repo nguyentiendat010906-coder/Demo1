@@ -1,31 +1,37 @@
 <div class="pos-layout">
 
-  <!-- MENU -->
+  <!-- ===================== MENU PANEL ===================== -->
   <div class="menu-panel">
-    <h3 class="panel-title">Menu</h3>
+    <h3 class="panel-title">Danh sách sản phẩm</h3>
     
     <!-- FILTER CONTROLS -->
     <div class="menu-filters">
-      <!-- Category Filter -->
-      <div class="filter-group">
-        <label>Nhóm món:</label>
-        <select [(ngModel)]="selectedCategory" (ngModelChange)="onCategoryChange()" class="filter-select">
-          <option value="all">🍽️ Tất cả</option>
-          <option *ngFor="let cat of categories" [value]="cat" [hidden]="cat === 'all'">
-            {{ cat === 'Bếp' ? '🍳' : cat === 'Bar' ? '🍹' : '📦' }} {{ cat }}
-          </option>
-        </select>
-      </div>
-      
       <!-- Search -->
-      <div class="filter-group">
-        <label>Tìm kiếm:</label>
+      <div class="filter-search">
+        <span class="search-icon">🔍</span>
         <input 
           type="text" 
           [(ngModel)]="searchText" 
           (ngModelChange)="onSearchChange()"
-          placeholder="🔍 Nhập tên món..." 
-          class="filter-input">
+          placeholder="Quét mã vạch hoặc tìm tên sản phẩm...">
+      </div>
+      
+      <!-- Category Tabs -->
+      <div class="filter-tabs">
+        <button 
+          class="filter-tab"
+          [class.active]="selectedCategory === 'all'"
+          (click)="selectedCategory = 'all'; onCategoryChange()">
+          🍽️ Tất cả
+        </button>
+        <button 
+          *ngFor="let cat of categories"
+          [hidden]="cat === 'all'"
+          class="filter-tab"
+          [class.active]="selectedCategory === cat"
+          (click)="selectedCategory = cat; onCategoryChange()">
+          {{ cat === 'Bếp' ? '🍳' : cat === 'Bar' ? '🍹' : '📦' }} {{ cat }}
+        </button>
       </div>
     </div>
     
@@ -34,74 +40,59 @@
       <div class="menu-item"
            *ngFor="let m of filteredMenu"
            (click)="addItem(m)">
-        <span class="menu-name">{{ m.name }}</span>
-        <span class="menu-price">{{ m.price | number }} đ</span>
+        <div class="menu-item-image">
+          {{ m.category === 'Bếp' ? '🍳' : m.category === 'Bar' ? '🍹' : '📦' }}
+          <span class="menu-item-stock">x{{ m.stock || 15 }}</span>
+        </div>
+        <div class="menu-item-info">
+          <div class="menu-name">{{ m.name }}</div>
+          <div class="menu-price">{{ m.price | number }}đ</div>
+        </div>
       </div>
       
       <!-- Empty state -->
-      <div *ngIf="filteredMenu.length === 0" class="menu-empty">
-        <p>Không tìm thấy món nào</p>
+      <div *ngIf="filteredMenu.length === 0" class="menu-empty" style="grid-column: 1/-1;">
+        <p>❌ Không tìm thấy sản phẩm nào</p>
       </div>
     </div>
   </div>
 
-  <!-- INVOICE -->
+  <!-- ===================== INVOICE PANEL ===================== -->
   <div class="invoice-panel">
 
     <!-- HEADER -->
     <div class="invoice-header">
       <div class="header-left">
-        <h3>{{ tableName || 'Bàn ' + tableId }}</h3>
-        <div>Nhóm: <b>{{ groupName }}</b></div>
-        <div>Thu ngân: <b>{{ cashier }}</b></div>
+        <h3>{{ tableName || 'Đơn hàng #' + tableId }}</h3>
+        <div>⏰ Giờ vào: {{ startTime | date:'HH:mm dd/MM/yyyy' }}</div>
+        <div>👤 Thu ngân: <b>{{ cashier }}</b></div>
       </div>
 
       <div class="header-right">
         <div class="time">
-          <div>Giờ vào: {{ startTime | date:'HH:mm dd/MM/yyyy' }}</div>
-          <div>Phục vụ: {{ serviceMinutes }} phút</div>
+          <div>⏱️ Phục vụ: {{ serviceMinutes }} phút</div>
         </div>
         <div class="grand-total">
-          {{ total | number }} đ
+          {{ total | number }}đ
         </div>
       </div>
     </div>
 
     <!-- CUSTOMER INFO -->
     <div class="customer-info">
-      <h4>Thông tin khách hàng</h4>
-      <div class="customer-form">
-        <div class="form-group">
-          <label>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16">
-              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-            Tên khách hàng:
-          </label>
-          <input 
-            type="text" 
-            [(ngModel)]="customerName" 
-            (blur)="updateCustomerInfo()"
-            placeholder="Nhập tên khách hàng..." 
-            class="customer-input">
+      <div class="customer-display">
+        <h4>👤 Thông tin khách hàng</h4>
+        <div class="customer-details" *ngIf="customerName || customerPhone">
+          <span><strong>{{ customerName || 'Khách lẻ' }}</strong></span>
+          <span *ngIf="customerPhone">📞 {{ customerPhone }}</span>
         </div>
-        
-        <div class="form-group">
-          <label>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16">
-              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
-            </svg>
-            Số điện thoại:
-          </label>
-          <input 
-            type="tel" 
-            [(ngModel)]="customerPhone" 
-            (blur)="updateCustomerInfo()"
-            placeholder="Nhập số điện thoại..." 
-            class="customer-input">
+        <div class="customer-details" *ngIf="!customerName && !customerPhone">
+          <span class="empty">Chưa có thông tin khách hàng</span>
         </div>
       </div>
+      <button class="add-customer-btn" (click)="openCustomerModal()">
+        {{ customerName ? '✏️ Sửa' : '➕ Thêm' }}
+      </button>
     </div>
 
     <!-- ITEMS -->
@@ -110,13 +101,13 @@
         <div class="item-name">{{ i.productName }}</div>
 
         <div class="qty-control">
-          <button (click)="decrease(i)">-</button>
+          <button (click)="decrease(i)">−</button>
           <span class="qty">{{ i.quantity }}</span>
           <button (click)="increase(i)">+</button>
         </div>
 
         <div class="item-price">
-          {{ i.unitPrice * i.quantity | number }} đ
+          {{ i.unitPrice * i.quantity | number }}đ
         </div>
 
         <button class="remove" (click)="remove(i)">✕</button>
@@ -127,19 +118,118 @@
     <div class="summary">
       <div class="line">
         <span>Tạm tính</span>
-        <span>{{ subTotal | number }} đ</span>
+        <span>{{ subTotal | number }}đ</span>
       </div>
       <div class="line">
         <span>VAT (10%)</span>
-        <span>{{ vat | number }} đ</span>
+        <span>{{ vat | number }}đ</span>
       </div>
       <div class="line total">
-        <b>Thanh toán</b>
-        <b>{{ total | number }} đ</b>
+        <b>Tổng thanh toán</b>
+        <b>{{ total | number }}đ</b>
       </div>
 
-      <button class="pay" [disabled]="items.length === 0" (click)="saveInvoice()">Thanh toán</button>
+      <button class="pay" [disabled]="items.length === 0" (click)="saveInvoice()">
+        Thanh toán
+      </button>
     </div>
 
+  </div>
+</div>
+
+<!-- ===================== CUSTOMER MODAL ===================== -->
+<div class="modal-overlay" *ngIf="showCustomerModal" (click)="closeCustomerModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h3>👤 Thông tin khách hàng</h3>
+      <button class="modal-close" (click)="closeCustomerModal()">✕</button>
+    </div>
+    
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <form class="modal-form">
+        
+        <!-- Row 1: Họ tên & Số điện thoại -->
+        <div class="form-row">
+          <div class="form-field">
+            <label>
+              Họ và tên <span class="required">*</span>
+            </label>
+            <input 
+              type="text" 
+              [(ngModel)]="customerName"
+              name="customerName"
+              placeholder="Nhập họ và tên..."
+              required>
+          </div>
+          
+          <div class="form-field">
+            <label>
+              Số điện thoại <span class="required">*</span>
+            </label>
+            <input 
+              type="tel" 
+              [(ngModel)]="customerPhone"
+              name="customerPhone"
+              placeholder="Nhập số điện thoại..."
+              required>
+          </div>
+        </div>
+        
+        <!-- Row 2: Mã số thuế & Số CCCD -->
+        <div class="form-row">
+          <div class="form-field">
+            <label>Mã số thuế</label>
+            <input 
+              type="text" 
+              [(ngModel)]="customerTaxCode"
+              name="customerTaxCode"
+              placeholder="Nhập mã số thuế...">
+          </div>
+          
+          <div class="form-field">
+            <label>Số CCCD/CMND</label>
+            <input 
+              type="text" 
+              [(ngModel)]="customerIdCard"
+              name="customerIdCard"
+              placeholder="Nhập số CCCD/CMND...">
+          </div>
+        </div>
+        
+        <!-- Row 3: Email -->
+        <div class="form-field full-width">
+          <label>Email</label>
+          <input 
+            type="email" 
+            [(ngModel)]="customerEmail"
+            name="customerEmail"
+            placeholder="Nhập địa chỉ email...">
+        </div>
+        
+        <!-- Row 4: Địa chỉ -->
+        <div class="form-field full-width">
+          <label>Địa chỉ</label>
+          <textarea 
+            [(ngModel)]="customerAddress"
+            name="customerAddress"
+            placeholder="Nhập địa chỉ đầy đủ..."></textarea>
+        </div>
+        
+      </form>
+    </div>
+    
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="modal-btn cancel" (click)="closeCustomerModal()">
+        Hủy
+      </button>
+      <button class="modal-btn save" (click)="saveCustomerInfo()">
+        💾 Lưu thông tin
+      </button>
+    </div>
+    
   </div>
 </div>

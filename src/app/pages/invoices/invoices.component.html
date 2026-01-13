@@ -1,5 +1,5 @@
 <div class="invoices-page">
-  <h2 class="title">Danh sách hóa đơn</h2>
+  <h2 class="title"><i class="bi bi-receipt"></i> Quản lý hóa đơn</h2>
 
   <div *ngIf="invoices.length === 0" class="empty-state">
     Chưa có hóa đơn nào
@@ -70,7 +70,7 @@
 
         <div class="info-item">
           <span class="label">Khách hàng:</span>
-          <span class="value">{{ selectedInvoice.customer?.name || 'Khách lẻ' }}</span>
+           <span class="value">{{ selectedInvoice.customerName || 'Khách lẻ' }}</span>
         </div>
 
         <div class="info-item" *ngIf="selectedInvoice.customer?.phone">

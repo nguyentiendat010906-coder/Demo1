@@ -13,7 +13,15 @@ export class AppComponent {
   constructor(public router: Router) {}
 
   showLang = false;
+  sidebarOpen = false;
+  
+toggleSidebar() {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
 
+  closeSidebar() {
+    this.sidebarOpen = false;
+  }
 toggleLang() {
   this.showLang = !this.showLang;
 }

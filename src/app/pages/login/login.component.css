@@ -1,10 +1,10 @@
 *, *::before, *::after {
   box-sizing: border-box;
 }
+
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
 }
-
 
 .auth-wrapper {
   min-height: 100vh;
@@ -74,25 +74,13 @@ label {
   color: #9ca3af;
 }
 
-.toggle-eye {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: #9ca3af;
-}
-
-.toggle-eye:hover {
-  color: #2563eb;
-}
-
 input {
   width: 100%;
-  padding: 12px 42px;
+  padding: 12px 14px 12px 42px;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
   outline: none;
+  font-size: 14px;
 }
 
 input:focus {
@@ -112,9 +100,8 @@ input:focus {
   cursor: pointer;
 }
 
-.btn-submit:disabled {
-  opacity: .6;
-  cursor: not-allowed;
+.btn-submit:hover {
+  opacity: 0.95;
 }
 
 .error {

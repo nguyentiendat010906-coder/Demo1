@@ -23,6 +23,7 @@
               name="username"
               [(ngModel)]="username"
               placeholder="Nhập tài khoản"
+              required
             />
           </div>
         </div>
@@ -34,25 +35,17 @@
             <i class="fa-solid fa-lock input-icon"></i>
 
             <input
-              [type]="showPassword ? 'text' : 'password'"
+              type="password"
               name="password"
               [(ngModel)]="password"
               placeholder="Nhập mật khẩu"
+              required
             />
 
-            <i
-              class="fa-solid toggle-eye"
-              [ngClass]="showPassword ? 'fa-eye' : 'fa-eye-slash'"
-              (click)="togglePasswordVisibility()"
-            ></i>
           </div>
         </div>
 
-        <button
-          type="submit"
-          class="btn-submit"
-          
-        >
+        <button type="submit" class="btn-submit">
           Đăng nhập
         </button>
 

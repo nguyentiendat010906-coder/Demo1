@@ -1,23 +1,35 @@
 <div class="tables-page">
   <!-- Controls section -->
   <section class="controls-section">
-    <div class="control-card">
-      <div class="control-header">
-        <svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path d="M12 2v20M2 12h20"/>
-        </svg>
-        <span>Thêm nhóm mới</span>
-      </div>
-      <div class="input-group">
-        <input [(ngModel)]="newGroupName" placeholder="Nhập tên nhóm..." class="modern-input">
-        <button (click)="createGroup()" class="btn-primary">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M12 5v14M5 12h14"/>
-          </svg>
-          Tạo nhóm
-        </button>
-      </div>
+    
+       <!-- Dialog xác nhận mở bàn -->
+<div class="confirm-overlay" *ngIf="showConfirmDialog" (click)="closeConfirmDialog()">
+  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+    <div class="confirm-icon">
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" stroke="#f59e0b" stroke-width="2"/>
+        <path d="M12 8v4m0 4h.01" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+      </svg>
     </div>
+    
+    <h3>Xác nhận mở bàn</h3>
+    <p class="table-name">{{ pendingTable?.name }}</p>
+    <p class="confirm-message">
+      Bạn có chắc chắn muốn mở bàn này và tạo hóa đơn mới?
+    </p>
+    
+    <div class="confirm-actions">
+      <button class="btn-cancel" (click)="closeConfirmDialog()">
+        Hủy
+      </button>
+      <button class="btn-confirm" (click)="confirmOpenTable()">
+        Xác nhận
+      </button>
+    </div>
+  </div>
+</div>
+      
+    
     
     <div class="control-card filter-card">
       <div class="control-header">
@@ -46,16 +58,7 @@
         <h2>{{ g.name }}</h2>
         <span class="table-count">{{ g.tables.length }} bàn</span>
       </div>
-      
-      <div class="add-table-section">
-        <input [(ngModel)]="newTableName" placeholder="Tên bàn mới..." class="table-input">
-        <button (click)="createTable(g.id)" class="btn-add-table">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M12 5v14M5 12h14"/>
-          </svg>
-          Thêm bàn
-        </button>
-      </div>
+  
     </div>
 
     <div class="tables-grid">

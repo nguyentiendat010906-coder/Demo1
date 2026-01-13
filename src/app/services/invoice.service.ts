@@ -2,6 +2,16 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
+// ✅ Interface cho customer info
+export interface UpdateCustomerInfoDto {
+  customerName?: string;
+  customerPhone?: string;
+  customerTaxCode?: string;
+  customerIdCard?: string;
+  customerEmail?: string;
+  customerAddress?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -10,7 +20,7 @@ export class InvoiceService {
 
   constructor(private http: HttpClient) {}
 
-  // ===== LẤY DANH SÁCH TẤT CẢ HÓA ĐƠN ===== ✅ THÊM METHOD NÀY
+  // ===== LẤY DANH SÁCH TẤT CẢ HÓA ĐƠN =====
   getAllInvoices(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
   }
@@ -50,10 +60,27 @@ export class InvoiceService {
     return this.http.delete<any>(`${this.apiUrl}/${invoiceId}/items/${itemId}`);
   }
 
+  // ===== CẬP NHẬT THÔNG TIN KHÁCH HÀNG ===== ✅ MỚI
+  updateCustomerInfo(invoiceId: number, customerInfo: UpdateCustomerInfoDto): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${invoiceId}/customer`, customerInfo);
+  }
+
   // Thanh toán (checkout)
- checkout(invoiceId: number, endTime: Date) {
-  return this.http.put(`${this.apiUrl}/${invoiceId}/checkout`, {
-    endTime: endTime.toISOString()
-  });
+  checkout(invoiceId: number, endTime: Date): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${invoiceId}/checkout`, {
+      endTime: endTime.toISOString()
+    });
+  }
+  // Thêm vào InvoiceService
+
+updateInvoiceCustomer(invoiceId: number, customerData: {
+  customerName?: string;
+  customerPhone?: string;
+  customerTaxCode?: string;
+  customerIdCard?: string;
+  customerEmail?: string;
+  customerAddress?: string;
+}) {
+  return this.http.put(`${this.apiUrl}/${invoiceId}/customer`, customerData);
 }
 }
