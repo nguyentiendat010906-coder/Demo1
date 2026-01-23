@@ -11,7 +11,7 @@ export interface TableGroup {
 
 @Injectable({ providedIn: 'root' })
 export class TableGroupService {
-  private apiUrl = 'http://localhost:5054/api/TableGroups';
+  private apiUrl = 'https://localhost:44385/api/TableGroups';
 
   constructor(private http: HttpClient) {}
 

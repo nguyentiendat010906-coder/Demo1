@@ -1,0 +1,113 @@
+<div class="modal-overlay" *ngIf="visible" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h3>👤 Thông tin khách hàng</h3>
+      <button class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <form #customerForm="ngForm" class="modal-form">
+
+        <!-- Nhóm khách hàng và Mã -->
+        <div class="form-row">
+          <div class="form-field">
+            <label>Nhóm khách hàng <span class="required">*</span></label>
+            
+            <div class="group-select-wrap">
+              <select class="form-input group-select" 
+                      [(ngModel)]="customer.groupID" 
+                      name="groupID"
+                      #groupID="ngModel"
+                      required>
+                <option [value]="null">Chọn nhóm</option>
+                <option *ngFor="let group of groups" [value]="group.id">
+                  {{group.code}} - {{group.name}}
+                </option>
+              </select>
+
+              <!-- Icon mũi tên xuống -->
+              <i class="pi pi-angle-down select-arrow"></i>
+              <!-- Icon + -->
+              <button class="group-add-btn" type="button" (click)="openAddGroup()">
+                <i class="pi pi-plus-circle"></i>
+              </button>
+            </div>
+            
+            <!-- Thông báo lỗi -->
+            <div class="error-message" *ngIf="groupID.invalid && (groupID.dirty || groupID.touched || submitted)">
+              <small *ngIf="groupID.errors?.['required']"> <i class="pi pi-info-circle"></i>Vui lòng chọn nhóm khách hàng</small>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>Mã nhóm</label>
+            <input 
+              [value]="customer.code || 'Tự động sinh'" 
+              disabled 
+              class="readonly-input"
+              placeholder="Tự động sinh sau khi lưu"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label>Họ và tên <span class="required">*</span></label>
+            <input [(ngModel)]="customer.name" 
+                   name="name"
+                   #name="ngModel"
+                   required>
+            <div class="error-message" *ngIf="name.invalid && (name.dirty || name.touched || submitted)">
+              <small *ngIf="name.errors?.['required']"><i class="pi pi-info-circle"></i> Vui lòng nhập họ và tên</small>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>Số điện thoại</label>
+            <input [(ngModel)]="customer.phone" name="phone">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label>Mã số thuế</label>
+            <input [(ngModel)]="customer.taxCode" name="taxCode">
+          </div>
+
+          <div class="form-field">
+            <label>CCCD/CMND</label>
+            <input [(ngModel)]="customer.cccd" name="cccd">
+          </div>
+        </div>
+
+        <div class="form-field full-width">
+          <label>Email</label>
+          <input [(ngModel)]="customer.email" name="email">
+        </div>
+
+        <div class="form-field full-width">
+          <label>Địa chỉ</label>
+          <textarea [(ngModel)]="customer.address" name="address"></textarea>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="modal-btn cancel" (click)="closeModal()">Hủy</button>
+      <button class="modal-btn save" (click)="saveModal()">
+        <i class="pi pi-check" style="vertical-align:-2px"></i>
+         Lưu
+      </button>
+    </div>
+
+  </div>
+</div>
+<app-group-modal 
+  [show]="showGroupModal"
+  [group]="editingGroup"
+  (closeModal)="handleCloseGroupModal()"
+  (onSubmit)="handleSubmitGroup($event)"
+  (onDelete)="handleDeleteGroup($event)"
+></app-group-modal>

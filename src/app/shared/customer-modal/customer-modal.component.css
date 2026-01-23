@@ -1,0 +1,229 @@
+/* customer-modal.component.css */
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-field label {
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.required {
+  color: #e74c3c;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+/* Readonly input style */
+.readonly-input {
+  background-color: #f5f5f5 !important;
+  color: #999 !important;
+  cursor: not-allowed;
+  font-style: italic;
+}
+
+.form-field textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+}
+
+.modal-close:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.modal-btn.cancel {
+  background: #95a5a6;
+  color: white;
+}
+
+.modal-btn.cancel:hover {
+  background: #7f8c8d;
+}
+
+.modal-btn.save {
+  background: #2c7ee9;
+  color: white;
+}
+
+.modal-btn.save:hover {
+  background: #37afff;
+}
+
+/* Group select wrapper */
+.group-select-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+
+.group-select {
+  width: 100%;
+  padding-right: 60px !important;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Khi giá trị null/undefined - màu mờ */
+.group-select:invalid,
+.group-select:not([value]) {
+  color: #aaa;
+}
+
+/* Khi đã chọn giá trị - màu đen */
+.group-select:valid {
+  color: #000;
+}
+
+/* Các option bình thường */
+.group-select option {
+  color: #000;
+}
+
+/* Icon mũi tên */
+.select-arrow {
+  position: absolute;
+  right: 35px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Button thêm nhóm */
+.group-add-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+  color: #666;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.group-add-btn:hover {
+  color: #3498db;
+}
+
+.group-add-btn i {
+  display: block;
+}
+/* Thêm vào cuối file CSS hiện tại */
+
+/* Thêm vào cuối file CSS */
+
+/* Error message */
+.error-message {
+  margin-top: 4px;
+  min-height: 18px;
+}
+
+.error-message small {
+  color: #e74c3c;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+

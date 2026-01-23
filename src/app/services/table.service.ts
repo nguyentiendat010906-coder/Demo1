@@ -17,7 +17,7 @@ export interface ApiTable {
 })
 export class TableService {
 
-  private apiUrl = 'http://localhost:5054/api/tables';
+  private apiUrl = 'https://localhost:44385/api/tables';
 
   constructor(private http: HttpClient) {}
 
@@ -76,7 +76,7 @@ getTableById(tableId: number): Observable<any> {
   // ===============================
   getOpenInvoiceByTable(tableId: number) {
     return this.http.get<any>(
-      `http://localhost:5054/api/invoices/by-table/${tableId}`
+      `https://localhost:44385/api/invoices/by-table/${tableId}`
     );
   }
 }

@@ -1,142 +1,221 @@
 <div class="customer-page">
-<h2 class="title">Khách hàng</h2>
+  <!-- Page Title -->
+  <div class="page-title">
+    <i class="bi bi-people"></i>
+    <span> Quản lý khách hàng</span>
+  </div>
 
-<!-- SEARCH BAR -->
-<div class="search-input">
-  <svg class="icon" viewBox="0 0 24 24">
-    <circle cx="11" cy="11" r="7"></circle>
-    <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
-  </svg>
-  <input type="text" placeholder="Tìm kiếm khách hàng..." />
+  <!-- Action Buttons -->
+<div class="action-buttons" (clickOutside)="showColumnPanel = false">
+
+  <!-- Button -->
+  <div class="column-toggle-wrapper">
+    <button class="btn-action btn-green"
+            (click)="toggleColumnPanel($event)">
+      ☰ Ẩn hiện cột
+    </button>
+
+    <!-- PANEL ẨN / HIỆN CỘT -->
+    <div class="column-panel" *ngIf="showColumnPanel">
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.group"> Nhóm</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.code"> Mã</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.name"> Tên</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.taxCode"> Mã số thuế</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.cccd"> CCCD</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.phone"> Điện thoại</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.address"> Địa chỉ</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.email"> Email</label>
+    </div>
+  </div>
+
+  <button class="btn-action btn-cyan" (click)="createNew()">
+    <i class="pi pi-plus-circle"></i> Tạo mới
+  </button>
+
 </div>
 
-<div class="table-wrapper" *ngIf="customers.length; else empty">
-  <table>
-    <thead>
-      <tr>
-        <th>Tên khách hàng</th>
-        <th>Số điện thoại</th>
-        <th>Địa chỉ</th>
-        <th>Thao tác</th>
-      </tr>
-    </thead>
 
-    <tbody>
-      <tr *ngFor="let c of customers">
-        <td>{{ c.name }}</td>
-        <td>{{ c.phone }}</td>
-        <td>{{ c.address || '—' }}</td>
-        <td>
-          <button class="btn-view" (click)="viewDetail(c)">👁️ Xem</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+  <!-- Content Card -->
+  <div class="content-card">
+     <div class="inner-box">
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div class="filter-item">
+        <label>Năm</label>
+        <select class="form-input" [(ngModel)]="selectedYear">
+          <option>2026</option>
+        </select>
+      </div>
 
-<ng-template #empty>
-  <p class="empty">Chưa có khách hàng</p>
-</ng-template>
+<div class="filter-item">
+  <label>Nhóm</label>
 
-<!-- ===================== CUSTOMER MODAL - EDIT MODE ONLY ===================== -->
-<div class="modal-overlay" *ngIf="selectedCustomer" (click)="closeModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    
-    <!-- Modal Header -->
-    <div class="modal-header">
-      <h3>👤 Chỉnh sửa thông tin</h3>
-      <button class="modal-close" (click)="closeModal()">✕</button>
-    </div>
-    
-    <!-- Modal Body - FORM EDIT -->
-    <div class="modal-body">
-      <form class="modal-form">
-        
-        <!-- Row 1: Họ tên & Số điện thoại -->
-        <div class="form-row">
-          <div class="form-field">
-            <label>
-              Họ và tên <span class="required">*</span>
-            </label>
-            <input 
-              type="text" 
-              [(ngModel)]="selectedCustomer.name"
-              name="customerName"
-              placeholder="Nhập họ và tên..."
-              required>
-          </div>
-          
-          <div class="form-field">
-            <label>
-              Số điện thoại <span class="required">*</span>
-            </label>
-            <input 
-              type="tel" 
-              [(ngModel)]="selectedCustomer.phone"
-              name="customerPhone"
-              placeholder="Nhập số điện thoại..."
-              required>
-          </div>
+  <div class="group-select-wrap">
+    <!-- Custom Select Dropdown -->
+    <div class="custom-group-select" [class.open]="showGroupDropdown">
+      <!-- Header - Click để mở dropdown -->
+      <div class="select-header" (click)="toggleGroupDropdown()">
+        <span class="selected-value">{{ getSelectedGroupText() }}</span>
+        <i class="pi pi-angle-down select-arrow"></i>
+            <button class="group-add-btn" type="button" (click)="openGroupModal();$event.stopPropagation()">
+                 <i class="pi pi-plus-circle"></i>
+            </button>
+      </div>
+      
+
+      <!-- Dropdown options -->
+      <div class="select-options" *ngIf="showGroupDropdown">
+        <!-- Option: Tất cả -->
+        <div class="select-option" (click)="selectGroup(null)">
+          <span class="option-text">Tất cả</span>
         </div>
-        
-        <!-- Row 2: Mã số thuế & Số CCCD -->
-        <div class="form-row">
-          <div class="form-field">
-            <label>Mã số thuế</label>
-            <input 
-              type="text" 
-              [(ngModel)]="selectedCustomer.taxCode"
-              name="customerTaxCode"
-              placeholder="Nhập mã số thuế...">
-          </div>
-          
-          <div class="form-field">
-            <label>Số CCCD/CMND</label>
-            <input 
-              type="text" 
-              [(ngModel)]="selectedCustomer.idCard"
-              name="customerIdCard"
-              placeholder="Nhập số CCCD/CMND...">
-          </div>
+
+        <!-- Các option nhóm với icon sửa -->
+        <div 
+          *ngFor="let group of groups" 
+          class="select-option with-edit">
+          <span class="option-text" (click)="selectGroup(group.id)">
+            {{group.code}} - {{group.name}}
+          </span>
+          <button 
+            class="option-edit-btn" 
+            (click)="openEditGroupModal(group, $event)"
+            title="Sửa nhóm">
+            <i class="pi pi-pencil"></i>
+          </button>
         </div>
-        
-        <!-- Row 3: Email -->
-        <div class="form-field full-width">
-          <label>Email</label>
-          <input 
-            type="email" 
-            [(ngModel)]="selectedCustomer.email"
-            name="customerEmail"
-            placeholder="Nhập địa chỉ email...">
-        </div>
-        
-        <!-- Row 4: Địa chỉ -->
-        <div class="form-field full-width">
-          <label>Địa chỉ</label>
-          <textarea 
-            [(ngModel)]="selectedCustomer.address"
-            name="customerAddress"
-            placeholder="Nhập địa chỉ đầy đủ..."></textarea>
-        </div>
-        
-      </form>
-    </div>
-    
-    <!-- Modal Footer -->
-    <div class="modal-footer">
-      <button class="modal-btn delete" (click)="deleteCustomer()">
-        🗑️ Xóa
-      </button>
-      <div class="right-btns">
-        <button class="modal-btn cancel" (click)="closeModal()">
-          Đóng
-        </button>
-        <button class="modal-btn save" (click)="saveCustomer()">
-          💾 Lưu
-        </button>
       </div>
     </div>
     
+    <!-- Icon + để thêm nhóm mới -->
+
   </div>
 </div>
+
+
+
+
+      <div class="filter-item">
+        <label>Tìm theo</label>
+        <select class="form-input" [(ngModel)]="searchType">
+          <option value="name">Tên khách hàng</option>
+          <option value="taxCode">MST</option>
+          <option value="address">Địa chỉ</option>
+          <option value="phone">Điện thoại</option>
+          <option value="cccd">CCCD</option>
+        </select>
+      </div>
+
+      <div class="filter-item filter-search">
+        <label>&nbsp;</label>
+        <input type="text" class="form-input" 
+               placeholder="Tìm kiếm ..." 
+               [(ngModel)]="searchKeyword"
+               (keyup.enter)="applyFilter()">
+      </div>
+
+      <div class="filter-item">
+        <label>&nbsp;</label>
+        <div class="filter-btns">
+          <button class="btn-filter" (click)="applyFilter()">Lọc</button>
+          <button class="btn-clear" (click)="clearFilter()">Bỏ lọc</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="col-actions"></th>
+            <th *ngIf="visibleColumns.group">Nhóm</th>
+            <th *ngIf="visibleColumns.code">Mã</th>
+            <th *ngIf="visibleColumns.name">Tên</th>
+            <th *ngIf="visibleColumns.taxCode">Mã số thuế</th>
+            <th *ngIf="visibleColumns.cccd">Số CCCD</th>
+            <th *ngIf="visibleColumns.phone">Điện thoại</th>
+            <th *ngIf="visibleColumns.address">Địa chỉ</th>
+            <th *ngIf="visibleColumns.email">Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let customer of paginatedCustomers">
+            <td class="col-actions">
+              <button class="icon-btn edit-btn" (click)="viewDetail(customer)">
+                <i class="fa-regular fa-pen-to-square"></i>
+              </button>
+              <button class="icon-btn delete-btn" (click)="deleteCustomer(customer)">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
+            </td>
+            <td *ngIf="visibleColumns.group">{{ customer.group }}</td>
+            <td *ngIf="visibleColumns.code">{{ customer.code }}</td>
+            <td *ngIf="visibleColumns.name">{{ customer.name }}</td>
+            <td *ngIf="visibleColumns.taxCode">{{ customer.taxCode }}</td>
+            <td *ngIf="visibleColumns.cccd">{{ customer.cccd }}</td>
+            <td *ngIf="visibleColumns.phone">{{ customer.phone }}</td>
+            <td *ngIf="visibleColumns.address">{{ customer.address }}</td>
+            <td *ngIf="visibleColumns.email">{{customer.email}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-bar">
+      <div class="page-info">
+        Từ {{ (currentPage - 1) * pageSize + 1 }} đến {{ Math.min(currentPage * pageSize, totalItems) }} trên tổng {{ totalItems }}
+      </div>
+      <div class="page-controls">
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="goToFirstPage()">
+          <i class="fa-solid fa-angles-left"></i>
+        </button>
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+          <i class="fa-solid fa-angle-left"></i>
+        </button>
+        
+        <button class="page-btn" 
+                *ngFor="let page of pageNumbers" 
+                [class.active]="page === currentPage"
+                (click)="goToPage(page)">
+          {{ page }}
+        </button>
+        
+        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+          <i class="fa-solid fa-angle-right"></i>
+        </button>
+        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="goToLastPage()">
+          <i class="fa-solid fa-angles-right"></i>
+        </button>
+        
+        <select class="page-size" [(ngModel)]="pageSize" (change)="changePageSize()">
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+        </select>
+      </div>
+    </div>
 </div>
+  </div>
+</div>
+
+<!-- Modal Edit Customer -->
+<app-customer-modal
+  *ngIf="selectedCustomer"
+  [visible]="true"
+  [customer]="selectedCustomer"
+  (close)="closeModal()"
+  (save)="saveCustomer($event)"
+  (openGroupModal)="openGroupModalFromCustomer()">
+</app-customer-modal>
+
+<!-- Modal Group -->
+<app-group-modal
+  [show]="showModal"
+  [group]="editingGroup"
+  [groupType]="'customer'"
+  (closeModal)="handleCloseModal()"
+  (onSubmit)="handleSubmit($event)"
+  (onDelete)="handleDeleteGroup($event)">
+</app-group-modal>

@@ -1,0 +1,50 @@
+<div *ngIf="show" class="modal-overlay" (click)="close()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ editMode ? 'Sửa nhóm khách hàng' : 'Thêm nhóm mới' }}</h3>
+      <button class="close-btn" (click)="close()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Tên nhóm <span class="required">*</span></label>
+        <input 
+          type="text" 
+          [(ngModel)]="groupName"
+          (input)="errorMessage = ''"
+          placeholder="Nhập tên nhóm"
+          [class.error]="errorMessage"
+          class="form-control"
+          autofocus>
+        <!-- ← Hiển thị lỗi ở đây -->
+        <span *ngIf="errorMessage" class="error-message">{{ errorMessage }}</span>
+      </div>
+
+      <div *ngIf="editMode && group" class="form-group">
+        <label>Mã nhóm</label>
+        <input 
+          type="text" 
+          [value]="group.code"
+          class="form-control"
+          disabled>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div class="footer-left">
+        <button 
+          *ngIf="editMode" 
+          class="btn-delete-modal" 
+          (click)="deleteGroup()">
+          <i class="pi pi-trash"></i> Xóa nhóm
+        </button>
+      </div>
+      <div class="footer-right">
+        <button class="btn-secondary" (click)="close()">Hủy</button>
+        <button class="btn-primary" (click)="submit()">
+          {{ editMode ? 'Cập nhật' : 'Thêm mới' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

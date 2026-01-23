@@ -16,7 +16,7 @@ export interface UpdateCustomerInfoDto {
   providedIn: 'root'
 })
 export class InvoiceService {
-  private apiUrl = 'http://localhost:5054/api/invoices';
+  private apiUrl = 'https://localhost:44385/api/invoices';
 
   constructor(private http: HttpClient) {}
 

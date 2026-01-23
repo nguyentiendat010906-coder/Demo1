@@ -5,15 +5,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { TableService } from '../../services/table.service';
 import { InvoiceService } from '../../services/invoice.service';
+import { ModalService } from '../../shared/modal.service';
+import { CustomerModalComponent } from '../../shared/customer-modal/customer-modal.component';
+import { CustomerService } from '../../services/customer.service';
+import { Customer } from '../../models/customer';
+import { Product } from '../../models/product';
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  category: string;
-  unitType: 'Số lượng' | 'Thời gian';
-  stock: number | null;
-}
+
+
 
 interface InvoiceItem {
   id: number;
@@ -26,7 +25,7 @@ interface InvoiceItem {
 @Component({
   selector: 'app-table-invoice',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CustomerModalComponent],
   templateUrl: './table-invoice.component.html',
   styleUrls: ['./table-invoice.component.css']
 })
@@ -44,15 +43,30 @@ export class TableInvoiceComponent implements OnInit {
   discount = 0;
 
   invoiceId: number | null = null;
+  
+  // ✅ KHỞI TẠO GIÁ TRỊ MẶC ĐỊNH
+  customer: Customer = {
+    id: 0,
+    group: '',
+    code: '',
+    name: '',
+    taxCode: '',
+    cccd: '',
+    phone: '',
+    address: '',
+    email: ''
+  };
 
   // Filter controls
   selectedCategory = 'all';
   searchText = '';
   categories: string[] = [];
+  
 
   // Customer info
   customerName = '';
   customerPhone = '';
+  
   
   // Modal state
   showCustomerModal = false;
@@ -68,7 +82,9 @@ export class TableInvoiceComponent implements OnInit {
     private tableService: TableService,
     private invoiceService: InvoiceService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private modalService: ModalService,
+    private customerService: CustomerService  
   ) {}
 
   ngOnInit() {
@@ -78,7 +94,15 @@ export class TableInvoiceComponent implements OnInit {
       this.loadMenu();
       this.initInvoice();
     });
+
+    // 👇 NGHE LỆNH MỞ MODAL
+    this.modalService.openModal$.subscribe(name => {
+      if (name === 'customer') {
+        this.showCustomerModal = true;
+      }
+    });
   }
+
 
   // ===== LOAD TABLE INFO =====
   loadTableInfo() {
@@ -141,6 +165,19 @@ export class TableInvoiceComponent implements OnInit {
         this.customerEmail = invoice.customerEmail || '';
         this.customerAddress = invoice.customerAddress || '';
         
+        // ✅ CẬP NHẬT CUSTOMER OBJECT
+        this.customer = {
+          id: 0,
+          group: '',
+          code: '',
+          name: this.customerName,
+          taxCode: this.customerTaxCode,
+          cccd: this.customerIdCard,
+          phone: this.customerPhone,
+          address: this.customerAddress,
+          email: this.customerEmail
+        };
+        
         console.log('✅ Existing invoice loaded:', invoice);
         this.loadInvoiceItems();
       },
@@ -149,6 +186,20 @@ export class TableInvoiceComponent implements OnInit {
           next: (invoice) => {
             this.invoiceId = invoice.id;
             this.startTime = new Date(invoice.invoiceDate);
+            
+            // ✅ KHỞI TẠO CUSTOMER RỖNG CHO INVOICE MỚI
+            this.customer = {
+              id: 0,
+              group: '',
+              code: '',
+              name: '',
+              taxCode: '',
+              cccd: '',
+              phone: '',
+              address: '',
+              email: ''
+            };
+            
             console.log('✅ New invoice created:', invoice);
             this.loadInvoiceItems();
           }
@@ -177,79 +228,42 @@ export class TableInvoiceComponent implements OnInit {
     this.showCustomerModal = false;
   }
 
-  saveCustomerInfo() {
-    // Validate required fields
-    if (!this.customerName?.trim()) {
-      alert('Vui lòng nhập họ tên khách hàng!');
-      return;
-    }
-    
-    if (!this.customerPhone?.trim()) {
-      alert('Vui lòng nhập số điện thoại!');
-      return;
-    }
-    
-    // Validate phone number format (10-11 digits)
-    const phoneRegex = /^[0-9]{10,11}$/;
-    if (!phoneRegex.test(this.customerPhone.replace(/\s/g, ''))) {
-      alert('Số điện thoại không hợp lệ! Vui lòng nhập 10-11 chữ số.');
-      return;
-    }
-    
-    // Validate email if provided
-    if (this.customerEmail?.trim()) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(this.customerEmail)) {
-        alert('Email không hợp lệ!');
-        return;
-      }
-    }
-    
-    // Validate tax code format if provided (10 or 13 digits)
-    if (this.customerTaxCode?.trim()) {
-      const taxRegex = /^[0-9]{10}$|^[0-9]{13}$/;
-      if (!taxRegex.test(this.customerTaxCode)) {
-        alert('Mã số thuế không hợp lệ! Phải là 10 hoặc 13 chữ số.');
-        return;
-      }
-    }
-    
-    // Validate ID card format if provided (9 or 12 digits)
-    if (this.customerIdCard?.trim()) {
-      const idRegex = /^[0-9]{9}$|^[0-9]{12}$/;
-      if (!idRegex.test(this.customerIdCard)) {
-        alert('Số CCCD/CMND không hợp lệ! Phải là 9 hoặc 12 chữ số.');
-        return;
-      }
-    }
-    
-    // Update customer info via API
-    if (this.invoiceId) {
-      const customerData = {
-        customerName: this.customerName,
-        customerPhone: this.customerPhone,
-        customerTaxCode: this.customerTaxCode || undefined,
-        customerIdCard: this.customerIdCard || undefined,
-        customerEmail: this.customerEmail || undefined,
-        customerAddress: this.customerAddress || undefined
-      };
+  saveCustomerInfo(customer: Customer) {
+    // 1️⃣ Gán customer từ modal
+    this.customer = customer;
 
-      this.invoiceService.updateInvoiceCustomer(this.invoiceId, customerData).subscribe({
-        next: () => {
-          console.log('✅ Customer info updated successfully');
-          this.closeCustomerModal();
-          alert('Thông tin khách hàng đã được lưu!');
-        },
-        error: (err) => {
-          console.error('❌ Error updating customer info:', err);
-          alert('Có lỗi khi cập nhật thông tin khách hàng');
-        }
-      });
-    } else {
-      console.error('❌ No invoice ID available');
-      alert('Không thể lưu thông tin khách hàng');
-    }
+    // 2️⃣ Đồng bộ sang các field đang dùng
+this.customerName = customer.name ?? '';
+this.customerPhone = customer.phone ?? '';
+this.customerTaxCode = customer.taxCode ?? '';
+this.customerIdCard = customer.cccd ?? '';
+this.customerEmail = customer.email ?? '';
+this.customerAddress = customer.address ?? '';
+
+    // 3️⃣ Gọi API
+    if (!this.invoiceId) return;
+
+    const customerData = {
+      customerName: customer.name,
+      customerPhone: customer.phone,
+      customerTaxCode: customer.taxCode || undefined,
+      customerIdCard: customer.cccd || undefined,
+      customerEmail: customer.email || undefined,
+      customerAddress: customer.address || undefined
+    };
+
+    this.invoiceService.updateInvoiceCustomer(this.invoiceId, customerData).subscribe({
+      next: () => {
+        this.closeCustomerModal();
+        alert('Thông tin khách hàng đã được lưu!');
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Có lỗi khi lưu thông tin khách hàng');
+      }
+    });
   }
+
 
   // ===== POS CORE =====
   addItem(p: Product) {
@@ -312,21 +326,25 @@ export class TableInvoiceComponent implements OnInit {
   }
 
   // ===== CHECKOUT =====
-  saveInvoice() {
-    if (!this.invoiceId) return;
-    
-    const endTime = new Date();
-    
-    this.invoiceService.checkout(this.invoiceId, endTime).subscribe({
-      next: () => {
-        console.log('✅ Invoice checked out');
-        alert('Thanh toán thành công!');
-        this.router.navigate(['/invoices']);
-      },
-      error: (err) => {
-        console.error('❌ Error saving invoice:', err);
-        alert('Có lỗi khi lưu hóa đơn');
-      }
-    });
-  }
+ saveInvoice() {
+  if (!this.invoiceId) return;
+  
+  const endTime = new Date();
+  
+  this.invoiceService.checkout(this.invoiceId, endTime).subscribe({
+    next: () => {
+      console.log('✅ Invoice checked out');
+      alert('Thanh toán thành công!');
+      // ⭐ QUAY VỀ TRANG TABLES THAY VÌ INVOICES
+      this.router.navigate(['/tables']).then(() => {
+        // Reload lại trang để cập nhật trạng thái bàn
+        window.location.reload();
+      });
+    },
+    error: (err) => {
+      console.error('❌ Error saving invoice:', err);
+      alert('Có lỗi khi lưu hóa đơn');
+    }
+  });
+}
 }

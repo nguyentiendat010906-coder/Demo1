@@ -1,60 +1,171 @@
-<div class="page-content">
-<h2 class="page-title">Thực đơn</h2>
+<div class="product-page">
+  <!-- Page Title -->
+  <div class="page-title">
+    <i class="bi bi-box-seam"></i>
+    <span> Quản lý hàng hóa</span>
+  </div>
 
-<div class="search-input">
-  <svg class="icon" viewBox="0 0 24 24">
-    <circle cx="11" cy="11" r="7"></circle>
-    <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
-  </svg>
-  <input type="text" placeholder="Tìm kiếm khách hàng..." />
+  <!-- Action Buttons -->
+  <div class="action-buttons" (clickOutside)="showColumnPanel = false">
+    <div class="column-toggle-wrapper">
+      <button class="btn-action btn-green" (click)="toggleColumnPanel($event)">
+        ☰ Ẩn hiện cột
+      </button>
+
+      <div class="column-panel" *ngIf="showColumnPanel">
+        <label><input type="checkbox" [(ngModel)]="visibleColumns.category"> Danh mục</label>
+        <label><input type="checkbox" [(ngModel)]="visibleColumns.code"> Mã</label>
+        <label><input type="checkbox" [(ngModel)]="visibleColumns.name"> Tên món</label>
+        <label><input type="checkbox" [(ngModel)]="visibleColumns.price"> Giá</label>
+        <label><input type="checkbox" [(ngModel)]="visibleColumns.unit"> ĐVT</label>
+        <label><input type="checkbox" [(ngModel)]="visibleColumns.stock"> Tồn kho</label>
+      </div>
+    </div>
+
+    <button class="btn-action btn-cyan" (click)="createNew()">
+      <i class="pi pi-plus-circle"></i> Tạo mới
+    </button>
+  </div>
+
+  <!-- Content Card -->
+  <div class="content-card">
+    <div class="inner-box">
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="filter-item">
+          <label>Năm</label>
+          <select class="form-input" [(ngModel)]="selectedYear">
+            <option>2026</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>Danh mục</label>
+          <div class="group-select-wrap">
+            <div class="custom-group-select" [class.open]="showCategoryDropdown">
+              <div class="select-header" (click)="toggleCategoryDropdown()">
+                <span class="selected-value">{{ getSelectedCategoryText() }}</span>
+                <i class="pi pi-angle-down select-arrow"></i>
+                <button class="group-add-btn" type="button" (click)="openCategoryModal();$event.stopPropagation()">
+                  <i class="pi pi-plus-circle"></i>
+                </button>
+              </div>
+
+              <div class="select-options" *ngIf="showCategoryDropdown">
+                <div class="select-option" (click)="selectCategory(null)">
+                  <span class="option-text">Tất cả</span>
+                </div>
+
+                <div *ngFor="let category of categories" class="select-option with-edit">
+                  <span class="option-text" (click)="selectCategory(category.id)">
+                    {{category.code}} - {{category.name}}
+                  </span>
+                  <button class="option-edit-btn" (click)="openEditCategoryModal(category, $event)" title="Sửa danh mục">
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-item">
+          <label>Tìm theo</label>
+          <select class="form-input" [(ngModel)]="searchType">
+            <option value="name">Tên sản phẩm</option>
+            <option value="code">Mã sản phẩm</option>
+            <option value="category">Danh mục</option>
+          </select>
+        </div>
+
+        <div class="filter-item filter-search">
+          <label>&nbsp;</label>
+          <input type="text" class="form-input" 
+                 placeholder="Tìm kiếm ..." 
+                 [(ngModel)]="searchKeyword"
+                 (keyup.enter)="applyFilter()">
+        </div>
+
+        <div class="filter-item">
+          <label>&nbsp;</label>
+          <div class="filter-btns">
+            <button class="btn-filter" (click)="applyFilter()">Lọc</button>
+            <button class="btn-clear" (click)="clearFilter()">Bỏ lọc</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="col-actions"></th>
+              <th *ngIf="visibleColumns.code">Nhóm</th>
+              <th *ngIf="visibleColumns.code">Mã</th>
+              <th *ngIf="visibleColumns.category">Danh mục</th>
+              <th *ngIf="visibleColumns.name">Tên món</th>
+              <th *ngIf="visibleColumns.price">Giá</th>
+              <th *ngIf="visibleColumns.unit">ĐVT</th>
+              <th *ngIf="visibleColumns.stock">Tồn kho</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of paginatedProducts">
+              <td class="col-actions">
+                <button class="icon-btn edit-btn" (click)="viewDetail(product)">
+                  <i class="fa-regular fa-pen-to-square"></i>
+                </button>
+                <button class="icon-btn delete-btn" (click)="deleteProduct(product)">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </td>
+              <td *ngIf="visibleColumns.code">{{ product.code }}</td>
+              <td *ngIf="visibleColumns.code">{{ product.code }}</td>
+              <td *ngIf="visibleColumns.category">{{ product.category }}</td>
+              <td *ngIf="visibleColumns.name">{{ product.name }}</td>
+              <td *ngIf="visibleColumns.price">{{ product.price | number }}đ</td>
+              <td *ngIf="visibleColumns.unit">{{ product.unit }}</td>
+              <td *ngIf="visibleColumns.stock">{{ product.stock }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-bar">
+        <div class="page-info">
+          Từ {{ (currentPage - 1) * pageSize + 1 }} đến {{ Math.min(currentPage * pageSize, totalItems) }} trên tổng {{ totalItems }}
+        </div>
+        <div class="page-controls">
+          <button class="page-btn" [disabled]="currentPage === 1" (click)="goToFirstPage()">
+            <i class="fa-solid fa-angles-left"></i>
+          </button>
+          <button class="page-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+            <i class="fa-solid fa-angle-left"></i>
+          </button>
+
+          <button class="page-btn" 
+                  *ngFor="let page of pageNumbers" 
+                  [class.active]="page === currentPage"
+                  (click)="goToPage(page)">
+            {{ page }}
+          </button>
+
+          <button class="page-btn" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+            <i class="fa-solid fa-angle-right"></i>
+          </button>
+          <button class="page-btn" [disabled]="currentPage === totalPages" (click)="goToLastPage()">
+            <i class="fa-solid fa-angles-right"></i>
+          </button>
+
+          <select class="page-size" [(ngModel)]="pageSize" (change)="changePageSize()">
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+            <option [value]="50">50</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-
-
-<div class="table-container" *ngIf="products.length; else empty">
-  <table class="menu-table">
-    <thead>
-      <tr>
-        <th>Tên món</th>
-        <th>Danh mục</th>
-        <th>Giá</th>
-        <th>Tồn kho</th>
-        <th>Trạng thái</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      <tr *ngFor="let p of products">
-        <td>{{ p.name }}</td>
-        <td>{{ p.category }}</td>
-        <td>{{ p.price | number }}đ</td>
-        <td>{{ p.stock }}</td>
-        <td>
-          <span
-            class="status in-stock"
-            *ngIf="p.stock > 10"
-          >
-            Còn hàng
-          </span>
-
-          <span
-            class="status low-stock"
-            *ngIf="p.stock > 0 && p.stock <= 10"
-          >
-            Sắp hết
-          </span>
-
-          <span
-            class="status out-stock"
-            *ngIf="p.stock === 0"
-          >
-            Hết hàng
-          </span>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-</div>
-<ng-template #empty>
-  <p class="empty-text">Chưa có sản phẩm</p>
-</ng-template>

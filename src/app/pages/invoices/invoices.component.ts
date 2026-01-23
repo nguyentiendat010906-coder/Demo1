@@ -13,7 +13,7 @@ export class InvoicesComponent implements OnInit {
   invoices: any[] = [];
   selectedInvoice: any = null;
   
-  private apiUrl = 'http://localhost:5054/api/invoices';
+  private apiUrl = 'https://localhost:44385/api/invoices';
 
   constructor(private http: HttpClient) {}
 
