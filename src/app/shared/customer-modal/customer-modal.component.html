@@ -1,8 +1,8 @@
-<div class="modal-overlay" *ngIf="visible" (click)="closeModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
+<div class="modal-overlay" *ngIf="visible">
+  <div class="modal-content" >
 
     <div class="modal-header">
-      <h3>👤 Thông tin khách hàng</h3>
+      <h3>{{ editingCustomer ? 'Sửa khách hàng' : 'Tạo khách hàng' }}</h3>
       <button class="modal-close" (click)="closeModal()">✕</button>
     </div>
 
@@ -14,30 +14,33 @@
           <div class="form-field">
             <label>Nhóm khách hàng <span class="required">*</span></label>
             
-            <div class="group-select-wrap">
-              <select class="form-input group-select" 
-                      [(ngModel)]="customer.groupID" 
-                      name="groupID"
-                      #groupID="ngModel"
-                      required>
-                <option [value]="null">Chọn nhóm</option>
-                <option *ngFor="let group of groups" [value]="group.id">
-                  {{group.code}} - {{group.name}}
-                </option>
-              </select>
+<div class="custom-group-select" [class.open]="showCustomerGroupDropdown">
+  <div class="select-header" (click)="showCustomerGroupDropdown = !showCustomerGroupDropdown">
+    <span class="selected-value">{{ getCustomerSelectedGroupText() }}</span>
+    <i class="pi pi-angle-down select-arrow"></i>
+    <button class="group-add-btn" type="button" (click)="openAddGroup(); $event.stopPropagation()">
+      <i class="pi pi-plus-circle"></i>
+    </button>
+  </div>
 
-              <!-- Icon mũi tên xuống -->
-              <i class="pi pi-angle-down select-arrow"></i>
-              <!-- Icon + -->
-              <button class="group-add-btn" type="button" (click)="openAddGroup()">
-                <i class="pi pi-plus-circle"></i>
-              </button>
-            </div>
+  <div class="select-options" *ngIf="showCustomerGroupDropdown">
+    <div class="select-option" (click)="customer.groupID = undefined; showCustomerGroupDropdown = false">
+      <span class="option-text">Chọn nhóm</span>
+    </div>
+    <div *ngFor="let group of groups" class="select-option with-edit">
+      <span class="option-text" (click)="customer.groupID = group.id; showCustomerGroupDropdown = false">
+        {{ group.code }} - {{ group.name }}
+      </span>
+      <button class="option-edit-btn" type="button" (click)="editCustomerGroup(group, $event)" title="Sửa nhóm">
+        <i class="pi pi-pencil"></i>
+      </button>
+    </div>
+  </div>
+</div>
             
-            <!-- Thông báo lỗi -->
-            <div class="error-message" *ngIf="groupID.invalid && (groupID.dirty || groupID.touched || submitted)">
-              <small *ngIf="groupID.errors?.['required']"> <i class="pi pi-info-circle"></i>Vui lòng chọn nhóm khách hàng</small>
-            </div>
+                   <div class="error-message" *ngIf="!customer.groupID && submitted">
+                <small><i class="pi pi-info-circle"></i>Vui lòng chọn nhóm khách hàng</small>
+                    </div>
           </div>
 
           <div class="form-field">
@@ -65,7 +68,15 @@
 
           <div class="form-field">
             <label>Số điện thoại</label>
-            <input [(ngModel)]="customer.phone" name="phone">
+            <input [(ngModel)]="customer.phone" 
+                   name="phone"
+                   (blur)="validatePhone()"
+                   (input)="phoneError = ''"
+                   maxlength="10">
+            <!-- ← THÊM hiển thị lỗi SĐT -->
+            <div class="error-message" *ngIf="phoneError">
+              <small><i class="pi pi-info-circle"></i> {{ phoneError }}</small>
+            </div>
           </div>
         </div>
 
@@ -77,7 +88,16 @@
 
           <div class="form-field">
             <label>CCCD/CMND</label>
-            <input [(ngModel)]="customer.cccd" name="cccd">
+            <input [(ngModel)]="customer.cccd" 
+                   name="cccd"
+                   (blur)="validateCCCD()"
+                   (input)="cccdError = ''"
+                   maxlength="12"
+                  >
+            <!-- ← THÊM hiển thị lỗi CCCD -->
+            <div class="error-message" *ngIf="cccdError">
+              <small><i class="pi pi-info-circle"></i> {{ cccdError }}</small>
+            </div>
           </div>
         </div>
 
@@ -104,9 +124,11 @@
 
   </div>
 </div>
+
 <app-group-modal 
   [show]="showGroupModal"
   [group]="editingGroup"
+  [groupType]="'customer'"
   (closeModal)="handleCloseGroupModal()"
   (onSubmit)="handleSubmitGroup($event)"
   (onDelete)="handleDeleteGroup($event)"

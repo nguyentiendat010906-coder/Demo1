@@ -40,6 +40,16 @@ export class InvoiceService {
     return this.http.post<any>(`${this.apiUrl}/create-for-table/${tableId}`, {});
   }
 
+  // ✅ TẠO HÓA ĐƠN MANG VỀ (không có bàn)
+  createTakeawayInvoice(): Observable<any> {
+    const invoiceData = {
+      tableId: null, // Mang về không cần bàn
+      invoiceDate: new Date().toISOString(),
+      status: 'Open'
+    };
+    return this.http.post(this.apiUrl, invoiceData); // ✅ SỬA: bỏ /invoices
+  }
+
   // Lấy danh sách món trong hóa đơn
   getInvoiceItems(invoiceId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/${invoiceId}/items`);
@@ -60,9 +70,14 @@ export class InvoiceService {
     return this.http.delete<any>(`${this.apiUrl}/${invoiceId}/items/${itemId}`);
   }
 
-  // ===== CẬP NHẬT THÔNG TIN KHÁCH HÀNG ===== ✅ MỚI
-  updateCustomerInfo(invoiceId: number, customerInfo: UpdateCustomerInfoDto): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${invoiceId}/customer`, customerInfo);
+  // ✅ XÓA HÓA ĐƠN
+  deleteInvoice(invoiceId: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${invoiceId}`);
+  }
+
+  // ✅ CẬP NHẬT THÔNG TIN KHÁCH HÀNG
+  updateInvoiceCustomer(invoiceId: number, customerData: UpdateCustomerInfoDto): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${invoiceId}/customer`, customerData);
   }
 
   // Thanh toán (checkout)
@@ -71,16 +86,9 @@ export class InvoiceService {
       endTime: endTime.toISOString()
     });
   }
-  // Thêm vào InvoiceService
 
-updateInvoiceCustomer(invoiceId: number, customerData: {
-  customerName?: string;
-  customerPhone?: string;
-  customerTaxCode?: string;
-  customerIdCard?: string;
-  customerEmail?: string;
-  customerAddress?: string;
-}) {
-  return this.http.put(`${this.apiUrl}/${invoiceId}/customer`, customerData);
-}
+  // Hoàn tất hóa đơn
+  finalizeInvoice(invoiceId: string | number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${invoiceId}/finalize`, {});
+  }
 }

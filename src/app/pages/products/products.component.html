@@ -13,16 +13,18 @@
       </button>
 
       <div class="column-panel" *ngIf="showColumnPanel">
-        <label><input type="checkbox" [(ngModel)]="visibleColumns.category"> Danh mục</label>
-        <label><input type="checkbox" [(ngModel)]="visibleColumns.code"> Mã</label>
-        <label><input type="checkbox" [(ngModel)]="visibleColumns.name"> Tên món</label>
-        <label><input type="checkbox" [(ngModel)]="visibleColumns.price"> Giá</label>
-        <label><input type="checkbox" [(ngModel)]="visibleColumns.unit"> ĐVT</label>
-        <label><input type="checkbox" [(ngModel)]="visibleColumns.stock"> Tồn kho</label>
+        <label><input type="checkbox" [(ngModel)]="visibleColumns.image" (change)="saveVisibleColumns()"> Ảnh</label>
+        <label><input type="checkbox" [(ngModel)]="visibleColumns.group" (change)="saveVisibleColumns()"> Nhóm</label>
+        <label><input type="checkbox" [(ngModel)]="visibleColumns.category" (change)="saveVisibleColumns()"> Danh mục</label>
+        <label><input type="checkbox" [(ngModel)]="visibleColumns.code" (change)="saveVisibleColumns()"> Mã</label>
+        <label><input type="checkbox" [(ngModel)]="visibleColumns.name" (change)="saveVisibleColumns()"> Tên món</label>
+        <label><input type="checkbox" [(ngModel)]="visibleColumns.price" (change)="saveVisibleColumns()"> Giá</label>
+        <label><input type="checkbox" [(ngModel)]="visibleColumns.unit" (change)="saveVisibleColumns()"> ĐVT</label>
+        <label><input type="checkbox" [(ngModel)]="visibleColumns.stock" (change)="saveVisibleColumns()"> Tồn kho</label>
       </div>
     </div>
 
-    <button class="btn-action btn-cyan" (click)="createNew()">
+    <button class="btn-action btn-cyan" (click)="openModal()">
       <i class="pi pi-plus-circle"></i> Tạo mới
     </button>
   </div>
@@ -40,27 +42,27 @@
         </div>
 
         <div class="filter-item">
-          <label>Danh mục</label>
+          <label>Nhóm</label>
           <div class="group-select-wrap">
-            <div class="custom-group-select" [class.open]="showCategoryDropdown">
-              <div class="select-header" (click)="toggleCategoryDropdown()">
-                <span class="selected-value">{{ getSelectedCategoryText() }}</span>
+            <div class="custom-group-select" [class.open]="showGroupDropdown">
+              <div class="select-header" (click)="toggleGroupDropdown()">
+                <span class="selected-value">{{ getSelectedGroupText() }}</span>
                 <i class="pi pi-angle-down select-arrow"></i>
-                <button class="group-add-btn" type="button" (click)="openCategoryModal();$event.stopPropagation()">
+                <button class="group-add-btn" type="button" (click)="openGroupModal();$event.stopPropagation()">
                   <i class="pi pi-plus-circle"></i>
                 </button>
               </div>
 
-              <div class="select-options" *ngIf="showCategoryDropdown">
-                <div class="select-option" (click)="selectCategory(null)">
+              <div class="select-options" *ngIf="showGroupDropdown">
+                <div class="select-option" (click)="selectGroup(null)">
                   <span class="option-text">Tất cả</span>
                 </div>
 
-                <div *ngFor="let category of categories" class="select-option with-edit">
-                  <span class="option-text" (click)="selectCategory(category.id)">
-                    {{category.code}} - {{category.name}}
+                <div *ngFor="let group of groups" class="select-option with-edit">
+                  <span class="option-text" (click)="selectGroup(group.id)">
+                    {{group.code}} - {{group.name}}
                   </span>
-                  <button class="option-edit-btn" (click)="openEditCategoryModal(category, $event)" title="Sửa danh mục">
+                  <button class="option-edit-btn" (click)="openEditGroupModal(group, $event)" title="Sửa nhóm">
                     <i class="pi pi-pencil"></i>
                   </button>
                 </div>
@@ -69,14 +71,24 @@
           </div>
         </div>
 
-        <div class="filter-item">
-          <label>Tìm theo</label>
-          <select class="form-input" [(ngModel)]="searchType">
-            <option value="name">Tên sản phẩm</option>
-            <option value="code">Mã sản phẩm</option>
-            <option value="category">Danh mục</option>
-          </select>
-        </div>
+             <div class="filter-item">
+  <label>Tìm theo</label>
+  <div class="custom-group-select" [class.open]="showSearchTypeDropdown">
+    <div class="select-header" (click)="toggleSearchTypeDropdown()">
+      <span class="selected-value">{{ getSearchTypeText() }}</span>
+      <i class="pi pi-angle-down select-arrow"></i>
+    </div>
+
+    <div class="select-options" *ngIf="showSearchTypeDropdown">
+      <div class="select-option" (click)="selectSearchType('name')">
+        <span class="option-text">Tên sản phẩm</span>
+      </div>
+      <div class="select-option" (click)="selectSearchType('code')">
+        <span class="option-text">Mã sản phẩm</span>
+      </div>
+    </div>
+  </div>
+</div>
 
         <div class="filter-item filter-search">
           <label>&nbsp;</label>
@@ -85,7 +97,7 @@
                  [(ngModel)]="searchKeyword"
                  (keyup.enter)="applyFilter()">
         </div>
-
+        
         <div class="filter-item">
           <label>&nbsp;</label>
           <div class="filter-btns">
@@ -101,9 +113,10 @@
           <thead>
             <tr>
               <th class="col-actions"></th>
-              <th *ngIf="visibleColumns.code">Nhóm</th>
-              <th *ngIf="visibleColumns.code">Mã</th>
-              <th *ngIf="visibleColumns.category">Danh mục</th>
+              <th *ngIf="visibleColumns.image" style="width: 60px;">Ảnh</th>
+              <th *ngIf="visibleColumns.group" style="width: 60px;">Nhóm</th>
+              <th *ngIf="visibleColumns.code" style="width: 60px;">Mã</th>
+              <th *ngIf="visibleColumns.category" style="width: 100px;">Danh mục</th>
               <th *ngIf="visibleColumns.name">Tên món</th>
               <th *ngIf="visibleColumns.price">Giá</th>
               <th *ngIf="visibleColumns.unit">ĐVT</th>
@@ -120,12 +133,20 @@
                   <i class="fa-regular fa-trash-can"></i>
                 </button>
               </td>
-              <td *ngIf="visibleColumns.code">{{ product.code }}</td>
+         <td *ngIf="visibleColumns.image" class="col-image">
+              <img *ngIf="product.imageUrl" 
+                  [src]="'https://localhost:44385/' + product.imageUrl" 
+                  alt="{{product.name}}" 
+                 class="product-image"
+                  (error)="handleImageError($event)">
+                 <span *ngIf="!product.imageUrl">N/A</span>
+          </td>                                       
+              <td *ngIf="visibleColumns.group">{{ product.group }}</td>
               <td *ngIf="visibleColumns.code">{{ product.code }}</td>
               <td *ngIf="visibleColumns.category">{{ product.category }}</td>
               <td *ngIf="visibleColumns.name">{{ product.name }}</td>
               <td *ngIf="visibleColumns.price">{{ product.price | number }}đ</td>
-              <td *ngIf="visibleColumns.unit">{{ product.unit }}</td>
+              <td *ngIf="visibleColumns.unit">{{ product.unitType }}</td>
               <td *ngIf="visibleColumns.stock">{{ product.stock }}</td>
             </tr>
           </tbody>
@@ -169,3 +190,17 @@
     </div>
   </div>
 </div>
+<app-product-modal 
+  [(isOpen)]="showProductModal"
+  [reloadTrigger]="groupReloadTrigger"
+  [editingProduct]="editingProduct"
+  (onSave)="handleSave($event)">
+</app-product-modal>
+<app-group-modal
+  [show]="showGroupModal"
+  [group]="editingGroup"
+  [groupType]="'product'"
+  (closeModal)="handleCloseModal()"
+  (onSubmit)="handleSubmit($event)"
+  (onDelete)="handleDeleteGroup($event)">
+</app-group-modal>

@@ -1,0 +1,288 @@
+<div class="modal-overlay" *ngIf="isOpen">
+  <div class="modal-container">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>{{ editingProduct ? 'Sửa hàng hóa' : 'Tạo hàng hóa' }}</h2>
+      <button class="close-button" (click)="closeModal()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body" (click)="onModalBodyClick($event)">
+      <form #productForm="ngForm">
+        <div class="form-grid">
+          <!-- Left Section -->
+          <div class="form-left">
+            <!-- Nhóm sản phẩm & Mã hàng -->
+            <div class="form-row">
+              <div class="form-field">
+                <label>Nhóm sản phẩm <span class="required">*</span></label>
+                
+                <div class="custom-group-select" [class.open]="showModalGroupDropdown">
+                  <div class="select-header" (click)="toggleModalGroupDropdown()">
+                    <span class="selected-value">{{ getModalSelectedGroupText() }}</span>
+                    <i class="pi pi-angle-down select-arrow"></i>
+                    <button class="group-add-btn" type="button" (click)="addNewGroup(); $event.stopPropagation()">
+                      <i class="pi pi-plus-circle"></i>
+                    </button>
+                  </div>
+
+                  <div class="select-options" *ngIf="showModalGroupDropdown">
+                    <div class="select-option" (click)="formData.group = null; showModalGroupDropdown = false">
+                      <span class="option-text">Chọn nhóm</span>
+                    </div>
+                    <div *ngFor="let group of productGroups" class="select-option with-edit">
+                      <span class="option-text" (click)="formData.group = group.id; showModalGroupDropdown = false">
+                        {{ group.code }} - {{ group.name }}
+                      </span>
+                      <button class="option-edit-btn" type="button" (click)="editModalGroup(group, $event)" title="Sửa nhóm">
+                        <i class="pi pi-pencil"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="error-message" *ngIf="!formData.group && submitted">
+                  <small>
+                    <i class="pi pi-info-circle"></i>Vui lòng chọn nhóm sản phẩm
+                  </small>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label>Mã hàng <span class="text-muted">(Tự sinh)</span></label>
+                <input 
+                  type="text"
+                  [value]="formData.code || 'Tự động sinh'" 
+                  disabled 
+                  class="form-input readonly-input"
+                  placeholder="Tự động sinh"
+                >
+              </div>
+            </div>
+
+            <!-- Tên hàng -->
+            <div class="form-row">
+              <div class="form-field full-width">
+                <label>Tên hàng <span class="required">*</span></label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="formData.name" 
+                  name="name"
+                  class="form-input"
+                  required
+                />
+                <div class="error-message" *ngIf="!formData.name && submitted">
+                  <small>
+                    <i class="pi pi-info-circle"></i>Vui lòng nhập tên hàng
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- ✅ THAY ĐỔI: Danh mục dropdown (chỉ chọn 1) -->
+            <div class="form-row">
+              <div class="form-field full-width">
+                <label>Danh mục <span class="required">*</span></label>
+                <div class="custom-group-select" [class.open]="showCategoryDropdown">
+                  <div class="select-header" (click)="toggleCategoryDropdown()">
+                    <span class="selected-value" [class.placeholder]="!formData.category">
+                      {{ getCategoryText() }}
+                    </span>
+                    <i class="pi pi-angle-down select-arrow" style="right: 7px;"></i>
+                  </div>
+                  
+                  <div class="select-options" *ngIf="showCategoryDropdown">
+                    <div class="select-option" (click)="formData.category = ''; showCategoryDropdown = false">
+                      <span class="option-text">Chọn danh mục</span>
+                    </div>
+                    <div 
+                      *ngFor="let cat of categoryOptions" 
+                      class="select-option"
+                      [class.selected]="formData.category === cat"
+                    >
+                      <span class="option-text" (click)="selectCategory(cat)">
+                        <span class="check-icon" *ngIf="formData.category === cat">✓</span>
+                        {{ cat }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="error-message" *ngIf="!formData.category && submitted">
+                  <small>
+                    <i class="pi pi-info-circle"></i>Vui lòng chọn danh mục
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Đơn vị tính, Giá, Thuế suất, Tồn kho -->
+            <div class="form-row-4">
+              <div class="form-field">
+                <label>Đơn vị tính</label>
+                <div class="custom-group-select" [class.open]="showUnitDropdown">
+                  <div class="select-header" (click)="toggleUnitDropdown()">
+                    <span class="selected-value">{{ formData.unit || 'Chọn đơn vị' }}</span>
+                    <i class="pi pi-angle-down select-arrow" style="right: 7px;"></i>
+                  </div>
+                  <div class="select-options" *ngIf="showUnitDropdown">
+                    <div class="select-option" (click)="formData.unit = ''; showUnitDropdown = false">
+                      <span class="option-text">Chọn đơn vị</span>
+                    </div>
+                    <div *ngFor="let unit of unitOptions" class="select-option">
+                      <span class="option-text" (click)="formData.unit = unit; showUnitDropdown = false">
+                        {{ unit }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-field">
+                <label>Giá</label>
+                <input 
+                  type="number" 
+                  [(ngModel)]="formData.price" 
+                  name="price"
+                  class="form-input text-right"
+                  value="0"
+                />
+              </div>
+              
+              <div class="form-field">
+                <label>Thuế suất</label>
+                <div class="custom-group-select" [class.open]="showTaxDropdown">
+                  <div class="select-header" (click)="toggleTaxDropdown()">
+                    <span class="selected-value">{{ formData.tax || 'Chọn thuế suất' }}</span>
+                    <i class="pi pi-angle-down select-arrow" style="right: 7px;"></i>
+                  </div>
+                  <div class="select-options" *ngIf="showTaxDropdown">
+                    <div class="select-option" (click)="formData.tax = ''; showTaxDropdown = false">
+                      <span class="option-text">Chọn thuế suất</span>
+                    </div>
+                    <div *ngFor="let tax of taxOptions" class="select-option">
+                      <span class="option-text" (click)="formData.tax = tax; showTaxDropdown = false">
+                        {{ tax }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label>Tồn kho ban đầu</label>
+                <input 
+                  type="number" 
+                  [(ngModel)]="formData.initialStock" 
+                  name="initialStock"
+                  class="form-input text-right"
+                  value="0"
+                />
+              </div>
+            </div>
+
+            <!-- Checkboxes -->
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="formData.isService"
+                  name="isService"
+                />
+                <span>Dịch vụ</span>
+              </label>
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="formData.hasConversion"
+                  name="hasConversion"
+                />
+                <span>Quy đổi</span>
+              </label>
+            </div>
+
+            <!-- Ghi chú -->
+            <div class="form-field">
+              <label>Ghi chú</label>
+              <textarea 
+                [(ngModel)]="formData.note" 
+                name="note"
+                class="form-input"
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Right Section - Image Upload -->
+          <div class="form-right">
+            <div class="image-upload-area" [class.has-image]="imagePreview">
+              <input 
+                type="file" 
+                #fileInput 
+                (change)="onFileSelected($event)" 
+                accept="image/*"
+                style="display: none;"
+              />
+              
+              <!-- Khi chưa có ảnh -->
+              <div *ngIf="!imagePreview" class="upload-placeholder" (click)="fileInput.click()">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="upload-text">Thêm ảnh</span>
+                <span class="upload-hint">Tối đa 512MB</span>
+              </div>
+
+              <!-- Khi đã có ảnh -->
+              <div *ngIf="imagePreview" class="image-preview" (click)="fileInput.click()">
+                <img [src]="getImageUrl(imagePreview)" 
+                     (error)="handleImageError($event)"
+                     alt="Preview" />
+                
+                <!-- Nút xóa ảnh -->
+                <button type="button" class="remove-image" (click)="removeImage(); $event.stopPropagation()" title="Xóa ảnh">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="closeModal()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Đóng
+      </button>
+      <button type="button" class="btn-primary" (click)="onSubmit()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M13 4L6 11L3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ editingProduct ? 'Cập nhật' : 'Lưu' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Group Modal -->
+<app-group-modal
+  *ngIf="showGroupModal"
+  [show]="showGroupModal"
+  [group]="editingGroup"
+  [groupType]="'product'"
+  (closeModal)="handleCloseGroupModal()"
+  (onSubmit)="handleSubmitGroup($event)"
+  (onDelete)="handleDeleteGroup($event)"
+></app-group-modal>

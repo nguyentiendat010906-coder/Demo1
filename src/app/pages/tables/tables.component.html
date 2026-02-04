@@ -1,164 +1,338 @@
-<div class="tables-page">
-  <!-- Controls section -->
-  <section class="controls-section">
-    
-       <!-- Dialog xác nhận mở bàn -->
-<div class="confirm-overlay" *ngIf="showConfirmDialog" (click)="closeConfirmDialog()">
-  <div class="confirm-dialog" (click)="$event.stopPropagation()">
-    <div class="confirm-icon">
-      <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="10" stroke="#f59e0b" stroke-width="2"/>
-        <path d="M12 8v4m0 4h.01" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    </div>
-    
-    <h3>Xác nhận mở bàn</h3>
-    <p class="table-name">{{ pendingTable?.name }}</p>
-    <p class="confirm-message">
-      Bạn có chắc chắn muốn mở bàn này và tạo hóa đơn mới?
-    </p>
-    
-    <div class="confirm-actions">
-      <button class="btn-cancel" (click)="closeConfirmDialog()">
-        Hủy
-      </button>
-      <button class="btn-confirm" (click)="confirmOpenTable()">
-        Xác nhận
-      </button>
-    </div>
-  </div>
-</div>
-      
+<div class="main-area">
+    <!-- Left Panel -->
+    <div class="panel-wrapper">
+        <div class="panel">
+        
+     <!-- Panel Header -->
+<div class="panel-header">
+    <button class="nav-tab" 
+            (click)="changeTab('rooms')" 
+            [class.active]="activeTab === 'rooms'">
+        <i class="fa-solid fa-table-cells-large"></i>
+        Phòng bàn
+    </button>
+   <button class="nav-tab" 
+            (click)="changeTab('menu')" 
+            [class.active]="activeTab === 'menu'">
+        <i class="fa-solid fa-utensils"></i>
+        Thực đơn
+    </button>
     
     
-    <div class="control-card filter-card">
-      <div class="control-header">
-        <svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-        </svg>
-        <span>Lọc theo nhóm</span>
-      </div>
-      <select [(ngModel)]="selectedGroupId" (ngModelChange)="onGroupChange($event)" class="modern-select">
-        <option [value]="0">📋 Tất cả các bàn</option>
-        <option *ngFor="let g of groups" [value]="g.id">🏷️ {{ g.name }}</option>
-      </select>
-    </div>
-  </section>
+<!-- ✅ THAY THẾ PHẦN header-search CŨ BẰNG CODE NÀY -->
 
-  <!-- Groups and tables -->
-  <section *ngFor="let g of visibleGroups; trackBy: trackByGroupId" class="group-container">
-    <div class="group-header">
-      <div class="group-title">
-        <div class="group-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
-          </svg>
+<div class="header-search" [class.has-text]="searchQuery">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" 
+           placeholder="Tìm món..." 
+           [(ngModel)]="searchQuery"
+           (ngModelChange)="onSearchChange()"
+           (focus)="onSearchFocus()"
+           (blur)="onSearchBlur()">
+    <button class="clear-menu-search" 
+            *ngIf="searchQuery" 
+            (click)="clearSearch()"
+            title="Xóa tìm kiếm">
+        <i class="fa-solid fa-xmark"></i>
+    </button>
+    
+    <!-- ✅ DROPDOWN GỢI Ý -->
+    <div class="search-dropdown" *ngIf="showSearchDropdown && searchResults.length > 0">
+        <div class="search-result-item" 
+             *ngFor="let product of searchResults"
+             (mousedown)="selectSearchResult(product)">
+            <div class="result-info">
+                <div class="result-name">{{product.name}}</div>
+                <div class="result-category">{{product.category}}</div>
+            </div>
+            <div class="result-price">{{product.price | number:'1.0-0'}} đ</div>
         </div>
-        <h2>{{ g.name }}</h2>
-        <span class="table-count">{{ g.tables.length }} bàn</span>
-      </div>
-  
+        
+        <!-- NÚT XEM TẤT CẢ -->
+        <div class="search-footer" *ngIf="filteredMenuCount > 5">
+            <button (mousedown)="viewAllResults()">
+                <i class="fa-solid fa-grid"></i>
+                Xem tất cả {{filteredMenuCount}} kết quả
+            </button>
+        </div>
+    </div>
+    
+    <!-- ✅ THÔNG BÁO KHÔNG TÌM THẤY -->
+    <div class="search-dropdown no-results" 
+         *ngIf="showSearchDropdown && searchQuery && searchResults.length === 0">
+        <div class="no-results-message">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <p>Không tìm thấy món phù hợp</p>
+            <small>Thử tìm với từ khóa khác</small>
+        </div>
+    </div>
+</div>
+    
+</div>
+
+            <!-- Filter Toolbar -->
+<!-- Filter Toolbar -->
+<div class="filter-toolbar">
+    <!-- ✅ THANH TÌM KIẾM NÂNG CAO -->
+    <div class="advanced-search-container" *ngIf="showSearchBar">
+        <button class="back-search-btn" (click)="toggleSearchBar()" title="Đóng tìm kiếm">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <div class="advanced-search-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input 
+                type="text" 
+                class="advanced-search-input"
+                placeholder="Tìm theo tên bàn, tên khách hàng, món trong đơn..."
+                [(ngModel)]="advancedSearchQuery"
+                (ngModelChange)="performAdvancedSearch()"
+            />
+            <button 
+                class="clear-search-btn" 
+                *ngIf="advancedSearchQuery"
+                (click)="advancedSearchQuery = ''; performAdvancedSearch()"
+                title="Xóa tìm kiếm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        
+        <!-- ✅ HIỂN THỊ KẾT QUẢ TÌM KIẾM -->
+        <div class="search-result-count" *ngIf="advancedSearchQuery">
+            {{tables.length}} kết quả
+        </div>
+    </div>
+    
+    <!-- ✅ FILTER BUTTONS (Hiện khi KHÔNG search) -->
+    <ng-container *ngIf="!showSearchBar">
+        <button class="filter-btn" 
+                *ngFor="let filter of currentFilters"
+                [class.inactive]="selectedFilter !== filter"
+                (click)="selectFilter(filter)">
+            {{filter}}
+        </button>
+        
+        <div class="toolbar-icons">
+            <i class="fa-solid fa-magnifying-glass" 
+               (click)="toggleSearchBar()" 
+               title="Tìm kiếm nâng cao"></i>
+        </div>
+    </ng-container>
+</div>
+
+            <!-- Status Row -->
+<div class="status-row" *ngIf="activeTab === 'rooms'">
+    <div class="status-item" 
+         *ngFor="let status of statusList"
+         [class.active]="selectedStatus === status.key"
+         (click)="selectStatus(status.key)">
+        <i [class]="status.icon"></i>
+        {{status.label}}
+    </div>
+</div>
+
+            <!-- Content Area - Tables or Menu -->
+            <div class="table-area" *ngIf="activeTab === 'rooms'">
+                <div class="table-grid">
+                    <!-- Tables -->
+                     <div class="table-card" 
+     *ngFor="let table of tables"
+     [class.active]="selectedTable?.id === table.id"
+     [class.serving]="table.status === 'serving'"
+     [class.reserved]="table.status === 'reserved'"
+     (click)="selectTable(table)">
+     
+    <div class="table-icon">
+        <!-- ✅ Hiển thị thông tin khi đang phục vụ -->
+        <div class="table-info-overlay" *ngIf="table.status === 'serving' && table.totalAmount">
+            <div class="table-amount">
+                {{table.totalAmount | number:'1.0-0':'en-US'}}
+            </div>
+        </div>
+    </div>
+    
+    <b style="font-size:14px;" 
+       [style.color]="selectedTable?.id === table.id ? 'white' : '#64748b'">
+        {{table.name}}
+    </b>
+</div>
+                </div>
+            </div>
+
+            <!-- Menu Area -->
+            <div class="table-area" *ngIf="activeTab === 'menu'">
+                <div class="menu-grid">
+                    <div class="menu-item" 
+                         *ngFor="let product of filteredMenu"
+                         (click)="addItem(product)">
+                        <div class="menu-item-image">
+                           
+                        </div>
+                        <div class="menu-item-info">
+                            <div class="menu-item-name">{{product.name}}</div>
+                            <div class="menu-item-price">{{product.price | number:'1.0-0'}} đ</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Footer -->
+            <div class="panel-footer">
+                <input type="checkbox" 
+                       id="auto-menu" 
+                       [(ngModel)]="autoOpenMenu">
+                <label for="auto-menu">Mở thực đơn khi chọn bàn</label>
+            </div>
+        </div>
     </div>
 
-    <div class="tables-grid">
-      <div class="table-card" *ngFor="let t of g.tables" (click)="openTable(t)" [attr.data-status]="t.status">
-        <div class="table-card-inner">
-          <div class="table-header">
-            <h3 class="table-name">{{ t.name }}</h3>
-            <div class="table-status-badge" [attr.data-status]="t.status">
-              <span class="status-dot"></span>
-              <span class="status-text">{{ getStatusText(t.status) }}</span>
+    <!-- Right Panel - Order Details -->
+    <div class="panel-wrapper">
+        <div class="panel">
+            <!-- Panel Header -->
+            <div class="panel-header">
+                <div class="tab-badge" (click)="cancelInvoice()" style="cursor: pointer;" title="Hủy đơn hàng">
+                   {{orderCode}}<i class="fa-solid fa-xmark"></i>
+                </div>
+               
+                <div class="header-icons">
+                      <button class="back-btn" (click)="goBack()" title="Quay lại">
+                   <i class="pi pi-home"></i>
+                      </button>
+                </div>
             </div>
-          </div>
-          
-          <div class="table-info">
-            <div class="info-row">
-              <span class="info-label">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-                Khách hàng
-              </span>
-              <span class="info-value" [class.empty]="!t.customerName">
-                <ng-container *ngIf="t.status === 'serving'">
-                  {{ t.customerName || 'Khách lẻ' }}
-                </ng-container>
-                <ng-container *ngIf="t.status !== 'serving'">
-                  {{ t.customerName || 'Chưa có' }}
-                </ng-container>
-              </span>
-            </div>
-            
-            <div class="info-row">
-              <span class="info-label">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
-                </svg>
-                SĐT
-              </span>
-              <span class="info-value" [class.empty]="!t.customerPhone">
-                {{ t.customerPhone || 'Chưa có' }}
-              </span>
-            </div>
-            
-            <div class="info-row">
-              <span class="info-label">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                  <line x1="16" y1="2" x2="16" y2="6"/>
-                  <line x1="8" y1="2" x2="8" y2="6"/>
-                  <line x1="3" y1="10" x2="21" y2="10"/>
-                </svg>
-                Ngày bắt đầu
-              </span>
-              <span class="info-value" [class.empty]="!t.startDate" [class.live]="t.status === 'serving'">
-                {{ t.startDate ? (t.startDate | date:'dd/MM/yyyy') : 'Chưa mở' }}
-              </span>
-            </div>
-            
-            <div class="info-row">
-              <span class="info-label">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <line x1="12" y1="1" x2="12" y2="23"/>
-                  <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
-                </svg>
-                Thành tiền
-              </span>
-              <span class="info-value amount" 
-                    [class.empty]="!t.totalAmount || t.totalAmount === 0"
-                    [class.live]="t.status === 'serving' && t.totalAmount && t.totalAmount > 0">
-                {{ t.totalAmount ? (t.totalAmount | number:'1.0-0') + 'đ' : '0đ' }}
-              </span>
-            </div>
-          </div>
-          
-          <div class="table-actions">
-            <button *ngIf="t.status === 'empty'" (click)="openTable(t); $event.stopPropagation()" class="btn-action empty">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M3 12h12"/>
-              </svg>
-              Mở bàn
-            </button>
-            
-            <button *ngIf="t.status === 'reserved'" (click)="confirmReserved(t); $event.stopPropagation()" class="btn-action reserved">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-              Xác nhận khách tới
-            </button>
-            
-            <button *ngIf="t.status === 'serving'" (click)="openTable(t); $event.stopPropagation()" class="btn-action serving">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-              </svg>
-              Xem chi tiết
-            </button>
-          </div>
-        </div>
-      </div>
+
+<div class="order-toolbar">
+    <!-- ✅ CHỈ HIỂN THỊ THÔNG TIN BÀN -->
+    <div class="table-info" *ngIf="selectedTable">
+        <i class="fa-solid fa-table-cells"></i>
+        {{selectedTable.name}} / {{selectedTable.area}}
     </div>
-  </section>
+    
+    <!-- ✅ HIỂN THỊ THÔNG BÁO NẾU CHƯA CHỌN BÀN -->
+    <div class="table-info table-info-warning" *ngIf="!selectedTable">
+        <i class="fa-solid fa-exclamation-triangle"></i>
+        Vui lòng chọn bàn
+    </div>
+    
+    <div class="search-customer">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" 
+               placeholder="Tìm khách hàng " 
+               [(ngModel)]="customerSearch">
+    </div>
+    <!-- ✅ Dùng button wrapper -->
+    <button type="button" class="btn-add-customer" (click)="openCustomerModal()">
+        <i class="fa-regular fa-plus"></i>
+    </button>
 </div>
+
+            <!-- Customer Info Display -->
+            <div class="customer-info-bar" *ngIf="customer.name || customer.phone">
+                <div class="customer-details">
+                    <span *ngIf="customer.name">
+                        <i class="fa-solid fa-user"></i> {{customer.name}}
+                    </span>
+                    <span *ngIf="customer.phone">
+                        <i class="fa-solid fa-phone"></i> {{customer.phone}}
+                    </span>
+                </div>
+                <button class="edit-customer-btn" (click)="openCustomerModal()">
+                    <i class="fa-solid fa-edit"></i>
+                </button>
+            </div>
+
+            <!-- Empty Order State -->
+            <div class="empty-order" *ngIf="orderItems.length === 0">
+                <i class="fa-solid fa-receipt"></i>
+                <p>Chưa có món trong đơn</p>
+                <p>Vui lòng chọn bàn và món trong thực đơn</p>
+            </div>
+
+         
+<!-- Order Items List -->
+<cdk-virtual-scroll-viewport 
+    *ngIf="orderItems.length > 0"
+    class="order-list-viewport"
+    itemSize="76">
+    
+    <div class="order-item" *cdkVirtualFor="let item of orderItems">
+        <div class="item-info">
+            <span class="item-name">{{item.productName}}</span>
+            <span class="item-price">{{item.unitPrice | number:'1.0-0'}} đ</span>
+        </div>
+        <div class="item-controls">
+            <button (click)="updateQuantity(item.id, item.quantity - 1)">-</button>
+            <span>{{item.quantity}}</span>
+            <button (click)="updateQuantity(item.id, item.quantity + 1)">+</button>
+            <button (click)="removeMenuItem(item.id)" class="remove-btn">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </div>
+        <div class="item-total">
+            {{item.unitPrice * item.quantity | number:'1.0-0'}} đ
+        </div>
+    </div>
+</cdk-virtual-scroll-viewport>
+
+            <!-- Order Summary -->
+             <!-- Order Summary -->
+<div class="order-summary" *ngIf="orderItems.length > 0">
+    <div class="summary-row">
+        <span>Tạm tính</span>
+        <span>{{subTotal | number:'1.0-0'}} đ</span>
+    </div>
+    
+    <!-- ✅ THÊM DROPDOWN CHỌN VAT -->
+    <div class="summary-row vat-row">
+        <span>VAT</span>
+        <div class="vat-selector">
+            <select [(ngModel)]="vatRate" class="vat-dropdown">
+                <option *ngFor="let option of vatOptions" [value]="option.value">
+                    {{option.label}}
+                </option>
+            </select>
+            <span class="vat-amount">{{vat | number:'1.0-0'}} đ</span>
+        </div>
+    </div>
+    
+    <div class="summary-row" *ngIf="discount > 0">
+        <span>Giảm giá</span>
+        <span>-{{discount | number:'1.0-0'}} đ</span>
+    </div>
+</div>
+
+            <!-- Action Footer -->
+            <div class="action-footer">
+                <div class="total-row">
+                    <div class="total-label">
+                        Tổng tiền
+                        <span class="item-count">({{itemCount}} món)</span>
+                    </div>
+                    <div class="total-amount">{{totalAmount | number:'1.0-0'}} đ</div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-action btn-notify" 
+                            
+                            [disabled]="orderItems.length === 0">
+                        <i class="fa-solid fa-bell"></i>
+                        Thông báo 
+                    </button>
+                    <button class="btn-action btn-payment" 
+                            (click)="payment()"
+                            [disabled]="orderItems.length === 0">
+                        <i class="fa-solid fa-dollar-sign"></i>
+                        THANH TOÁN 
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ THAY ĐỔI: Thêm [visible] binding -->
+<app-customer-modal 
+    *ngIf="showCustomerModal"
+    [visible]="showCustomerModal"
+    (save)="saveCustomerInfo($event)"
+    (close)="closeCustomerModal()">
+</app-customer-modal>

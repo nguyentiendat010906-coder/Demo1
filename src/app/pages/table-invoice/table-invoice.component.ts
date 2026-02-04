@@ -1,350 +1,473 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ProductService } from '../../services/product.service';
-import { TableService } from '../../services/table.service';
+import { Router, ActivatedRoute } from '@angular/router';
+import { TableService, ApiTable, TableStatus } from '../../services/table.service';
+import { TableGroupService, TableGroup } from '../../services/table-group.service';
 import { InvoiceService } from '../../services/invoice.service';
-import { ModalService } from '../../shared/modal.service';
-import { CustomerModalComponent } from '../../shared/customer-modal/customer-modal.component';
-import { CustomerService } from '../../services/customer.service';
-import { Customer } from '../../models/customer';
-import { Product } from '../../models/product';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
+// Extended interfaces
+interface ExtendedApiTable extends ApiTable {
+  customerName?: string;
+  customerPhone?: string;
+  startDate?: Date | string;
+  totalAmount?: number;
+  invoiceId?: number;
+  serviceMinutes?: number;
+  area?: string;
+}
 
+interface ExtendedTableGroup extends Omit<TableGroup, 'tables'> {
+  tables: ExtendedApiTable[];
+}
 
+interface StatusItem {
+  key: string;
+  label: string;
+  icon: string;
+}
 
-interface InvoiceItem {
+interface OrderItem {
   id: number;
-  productId: number;
-  productName: string;
+  name: string;
+  price: number;
   quantity: number;
-  unitPrice: number;
+  menuItemId?: number;
 }
 
 @Component({
   selector: 'app-table-invoice',
   standalone: true,
-  imports: [CommonModule, FormsModule, CustomerModalComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './table-invoice.component.html',
   styleUrls: ['./table-invoice.component.css']
 })
 export class TableInvoiceComponent implements OnInit {
-  tableId = 0;
-  tableName = '';
-  groupName = '';
-  cashier = 'Admin';
+  // Tab và UI state
 
-  startTime = new Date();
+  activeTab: 'rooms' | 'menu' = 'rooms';
+  searchQuery = '';
+  customerSearch = '';
+  selectedFilter = 'Tất cả';
+  selectedStatus = 'all';
+  autoOpenMenu = false;
 
-  menu: Product[] = [];
-  filteredMenu: Product[] = [];
-  items: InvoiceItem[] = [];
-  discount = 0;
+  // Table management
+  groups: ExtendedTableGroup[] = [];
+  selectedGroupId = 0;
+  visibleGroups: ExtendedTableGroup[] = [];
+  allTables: ExtendedApiTable[] = [];
+  selectedTable: ExtendedApiTable | null = null;
 
-  invoiceId: number | null = null;
-  
-  // ✅ KHỞI TẠO GIÁ TRỊ MẶC ĐỊNH
-  customer: Customer = {
-    id: 0,
-    group: '',
-    code: '',
-    name: '',
-    taxCode: '',
-    cccd: '',
-    phone: '',
-    address: '',
-    email: ''
-  };
+  // Dialog
+  showConfirmDialog = false;
+  pendingTable: ExtendedApiTable | null = null;
 
-  // Filter controls
-  selectedCategory = 'all';
-  searchText = '';
-  categories: string[] = [];
-  
+  // Order management
+  orderCount = 1;
+  orderItems: OrderItem[] = [];
+  currentInvoiceId: number | null = null;
 
-  // Customer info
-  customerName = '';
-  customerPhone = '';
-  
-  
-  // Modal state
-  showCustomerModal = false;
-  
-  // Additional customer information
-  customerTaxCode = '';
-  customerIdCard = '';
-  customerEmail = '';
-  customerAddress = '';
+  // Filters
+  filters: string[] = ['Tất cả'];
+  statusList: StatusItem[] = [
+    { key: 'all', label: 'Tất cả', icon: 'fa-solid fa-circle' },
+    { key: 'empty', label: 'Còn trống', icon: 'fa-regular fa-circle' },
+    { key: 'serving', label: 'Phục vụ', icon: 'fa-solid fa-circle-dot' },
+    { key: 'reserved', label: 'Đã đặt', icon: 'fa-regular fa-circle-dot' }
+  ];
 
   constructor(
-    private productService: ProductService,
     private tableService: TableService,
+    private tableGroupService: TableGroupService,
     private invoiceService: InvoiceService,
-    private route: ActivatedRoute,
     private router: Router,
-    private modalService: ModalService,
-    private customerService: CustomerService  
+    private route: ActivatedRoute
   ) {}
 
-  ngOnInit() {
-    this.route.params.subscribe(params => {
-      this.tableId = +params['id'];
-      this.loadTableInfo();
-      this.loadMenu();
-      this.initInvoice();
-    });
-
-    // 👇 NGHE LỆNH MỞ MODAL
-    this.modalService.openModal$.subscribe(name => {
-      if (name === 'customer') {
-        this.showCustomerModal = true;
-      }
-    });
+  ngOnInit(): void {
+    this.loadData();
+    
+    // Auto refresh every 30 seconds
+    setInterval(() => {
+      this.loadData();
+    }, 30000);
   }
 
-
-  // ===== LOAD TABLE INFO =====
-  loadTableInfo() {
-    this.tableService.getTableById(this.tableId).subscribe({
-      next: (table: any) => {
-        this.tableName = table.name;
-        this.groupName = table.tableGroupName || 'Chưa có nhóm';
-        console.log('✅ Table info loaded:', table);
-      }
-    });
-  }
-
-  // ===== LOAD MENU =====
-  loadMenu() {
-    this.productService.getAllProducts().subscribe({
-      next: (products: Product[]) => {
-        this.menu = products.filter(p =>
-          p.unitType === 'Thời gian' || (p.stock ?? 0) > 0
-        );
+  loadData() {
+    this.tableGroupService.getGroups().subscribe({
+      next: (groups) => {
+        console.log('✅ Groups loaded:', groups);
         
-        // Extract unique categories
-        this.categories = ['all', ...new Set(this.menu.map(p => p.category))];
+        // Build filters from group names
+        this.filters = ['Tất cả', ...groups.map(g => g.name)];
         
-        this.filteredMenu = this.menu;
-        console.log('✅ Menu loaded:', this.menu);
-        console.log('✅ Categories:', this.categories);
-      }
-    });
-  }
-
-  // ===== FILTER MENU =====
-  filterMenu() {
-    this.filteredMenu = this.menu.filter(p => {
-      const matchCategory = this.selectedCategory === 'all' || p.category === this.selectedCategory;
-      const matchSearch = p.name.toLowerCase().includes(this.searchText.toLowerCase());
-      return matchCategory && matchSearch;
-    });
-  }
-
-  onCategoryChange() {
-    this.filterMenu();
-  }
-
-  onSearchChange() {
-    this.filterMenu();
-  }
-
-  // ===== INIT INVOICE =====
-  initInvoice() {
-    this.invoiceService.getInvoiceByTable(this.tableId).subscribe({
-      next: (invoice) => {
-        this.invoiceId = invoice.id;
-        this.startTime = new Date(invoice.invoiceDate);
-        
-        // Load customer info from invoice
-        this.customerName = invoice.customerName || '';
-        this.customerPhone = invoice.customerPhone || '';
-        this.customerTaxCode = invoice.customerTaxCode || '';
-        this.customerIdCard = invoice.customerIdCard || '';
-        this.customerEmail = invoice.customerEmail || '';
-        this.customerAddress = invoice.customerAddress || '';
-        
-        // ✅ CẬP NHẬT CUSTOMER OBJECT
-        this.customer = {
-          id: 0,
-          group: '',
-          code: '',
-          name: this.customerName,
-          taxCode: this.customerTaxCode,
-          cccd: this.customerIdCard,
-          phone: this.customerPhone,
-          address: this.customerAddress,
-          email: this.customerEmail
-        };
-        
-        console.log('✅ Existing invoice loaded:', invoice);
-        this.loadInvoiceItems();
-      },
-      error: () => {
-        this.invoiceService.createInvoiceForTable(this.tableId).subscribe({
-          next: (invoice) => {
-            this.invoiceId = invoice.id;
-            this.startTime = new Date(invoice.invoiceDate);
-            
-            // ✅ KHỞI TẠO CUSTOMER RỖNG CHO INVOICE MỚI
-            this.customer = {
-              id: 0,
-              group: '',
-              code: '',
-              name: '',
-              taxCode: '',
-              cccd: '',
-              phone: '',
-              address: '',
-              email: ''
-            };
-            
-            console.log('✅ New invoice created:', invoice);
-            this.loadInvoiceItems();
-          }
+        // Collect all serving tables for invoice loading
+        const servingTables: ExtendedApiTable[] = [];
+        groups.forEach(group => {
+          group.tables.forEach(table => {
+            if (table.status === 'serving') {
+              servingTables.push(table as ExtendedApiTable);
+            }
+          });
         });
-      }
-    });
-  }
 
-  // ===== LOAD ITEMS =====
-  loadInvoiceItems() {
-    if (!this.invoiceId) return;
-    this.invoiceService.getInvoiceItems(this.invoiceId).subscribe({
-      next: (items) => {
-        this.items = items;
-        console.log('✅ Items loaded:', items);
-      }
-    });
-  }
+        // Load invoice info for all serving tables
+        if (servingTables.length > 0) {
+          const invoiceRequests = servingTables.map(table => 
+            this.invoiceService.getInvoiceByTable(table.id).pipe(
+              map(invoice => {
+                return this.invoiceService.getInvoiceItems(invoice.id).pipe(
+                  map(items => {
+                    const subTotal = items.reduce((sum, item) => 
+                      sum + (item.unitPrice * item.quantity), 0
+                    );
+                    const vat = subTotal * 0.1;
+                    const total = subTotal + vat;
+                    
+                    return {
+                      tableId: table.id,
+                      invoiceId: invoice.id,
+                      startDate: invoice.invoiceDate,
+                      totalAmount: total,
+                      serviceMinutes: Math.floor(
+                        (Date.now() - new Date(invoice.invoiceDate).getTime()) / 60000
+                      ),
+                      customerName: invoice.customerName || '',
+                      customerPhone: invoice.customerPhone || ''
+                    };
+                  }),
+                  catchError(() => of(null))
+                );
+              }),
+              catchError(() => of(of(null)))
+            )
+          );
 
-  // ===== CUSTOMER MODAL =====
-  openCustomerModal() {
-    this.showCustomerModal = true;
-  }
+          forkJoin(invoiceRequests).subscribe(observables => {
+            forkJoin(observables.filter(obs => obs !== null)).subscribe(invoiceInfos => {
+              const invoiceMap = new Map();
+              invoiceInfos.forEach(info => {
+                if (info) {
+                  invoiceMap.set(info.tableId, info);
+                }
+              });
 
-  closeCustomerModal() {
-    this.showCustomerModal = false;
-  }
-
-  saveCustomerInfo(customer: Customer) {
-    // 1️⃣ Gán customer từ modal
-    this.customer = customer;
-
-    // 2️⃣ Đồng bộ sang các field đang dùng
-this.customerName = customer.name ?? '';
-this.customerPhone = customer.phone ?? '';
-this.customerTaxCode = customer.taxCode ?? '';
-this.customerIdCard = customer.cccd ?? '';
-this.customerEmail = customer.email ?? '';
-this.customerAddress = customer.address ?? '';
-
-    // 3️⃣ Gọi API
-    if (!this.invoiceId) return;
-
-    const customerData = {
-      customerName: customer.name,
-      customerPhone: customer.phone,
-      customerTaxCode: customer.taxCode || undefined,
-      customerIdCard: customer.cccd || undefined,
-      customerEmail: customer.email || undefined,
-      customerAddress: customer.address || undefined
-    };
-
-    this.invoiceService.updateInvoiceCustomer(this.invoiceId, customerData).subscribe({
-      next: () => {
-        this.closeCustomerModal();
-        alert('Thông tin khách hàng đã được lưu!');
+              // Update groups with invoice info
+              this.groups = groups.map(group => ({
+                ...group,
+                tables: group.tables.map(table => {
+                  const extendedTable = table as ExtendedApiTable;
+                  extendedTable.area = group.name;
+                  
+                  if (table.status === 'serving' && invoiceMap.has(table.id)) {
+                    const invoiceInfo = invoiceMap.get(table.id);
+                    return {
+                      ...extendedTable,
+                      invoiceId: invoiceInfo.invoiceId,
+                      startDate: invoiceInfo.startDate,
+                      totalAmount: invoiceInfo.totalAmount,
+                      serviceMinutes: invoiceInfo.serviceMinutes,
+                      customerName: invoiceInfo.customerName,
+                      customerPhone: invoiceInfo.customerPhone
+                    };
+                  }
+                  
+                  return extendedTable;
+                })
+              }));
+              
+              this.updateVisibleGroups();
+              this.buildAllTables();
+              this.updateStatusCount();
+            });
+          });
+        } else {
+          this.groups = groups.map(group => ({
+            ...group,
+            tables: group.tables.map(table => {
+              const extendedTable = table as ExtendedApiTable;
+              extendedTable.area = group.name;
+              return extendedTable;
+            })
+          }));
+          
+          this.updateVisibleGroups();
+          this.buildAllTables();
+          this.updateStatusCount();
+        }
       },
       error: (err) => {
-        console.error(err);
-        alert('Có lỗi khi lưu thông tin khách hàng');
+        console.error('❌ Load data error:', err);
       }
     });
   }
 
+  buildAllTables() {
+    this.allTables = [];
+    this.groups.forEach(group => {
+      this.allTables.push(...group.tables);
+    });
+  }
 
-  // ===== POS CORE =====
-  addItem(p: Product) {
-    if (!this.invoiceId) return;
+  updateStatusCount() {
+    const emptyCount = this.allTables.filter(t => t.status === 'empty').length;
+    const servingCount = this.allTables.filter(t => t.status === 'serving').length;
+    const reservedCount = this.allTables.filter(t => t.status === 'reserved').length;
+    
+    this.statusList = [
+      { key: 'all', label: `Tất cả (${this.allTables.length})`, icon: 'fa-solid fa-circle' },
+      { key: 'empty', label: `Còn trống (${emptyCount})`, icon: 'fa-regular fa-circle' },
+      { key: 'serving', label: `Phục vụ (${servingCount})`, icon: 'fa-solid fa-circle-dot' },
+      { key: 'reserved', label: `Đã đặt (${reservedCount})`, icon: 'fa-regular fa-circle-dot' }
+    ];
+  }
 
-    const existing = this.items.find(x => x.productId === p.id);
-
-    if (existing) {
-      const dto = { productId: existing.productId, quantity: existing.quantity + 1, unitPrice: existing.unitPrice };
-      this.invoiceService.updateInvoiceItem(this.invoiceId, existing.id, dto).subscribe({
-        next: () => this.loadInvoiceItems()
-      });
+  updateVisibleGroups() {
+    if (this.selectedGroupId === 0) {
+      this.visibleGroups = this.groups;
     } else {
-      const itemDto = { productId: p.id, quantity: 1, unitPrice: p.price };
-      this.invoiceService.addInvoiceItem(this.invoiceId, itemDto).subscribe({
-        next: () => this.loadInvoiceItems()
-      });
+      this.visibleGroups = this.groups.filter(g => g.id === this.selectedGroupId);
     }
   }
 
-  increase(i: InvoiceItem) {
-    if (!this.invoiceId) return;
-    const dto = { productId: i.productId, quantity: i.quantity + 1, unitPrice: i.unitPrice };
-    this.invoiceService.updateInvoiceItem(this.invoiceId, i.id, dto).subscribe({
-      next: () => this.loadInvoiceItems()
-    });
+  onGroupChange(value: any) {
+    this.selectedGroupId = Number(value);
+    this.updateVisibleGroups();
   }
 
-  decrease(i: InvoiceItem) {
-    if (!this.invoiceId || i.quantity <= 1) return;
-    const dto = { productId: i.productId, quantity: i.quantity - 1, unitPrice: i.unitPrice };
-    this.invoiceService.updateInvoiceItem(this.invoiceId, i.id, dto).subscribe({
-      next: () => this.loadInvoiceItems()
-    });
-  }
-
-  remove(i: InvoiceItem) {
-    if (!this.invoiceId) return;
-    this.invoiceService.deleteInvoiceItem(this.invoiceId, i.id).subscribe({
-      next: () => this.loadInvoiceItems()
-    });
-  }
-
-  // ===== TIME =====
-  get serviceMinutes(): number {
-    return Math.floor((Date.now() - this.startTime.getTime()) / 60000);
-  }
-
-  // ===== MONEY =====
-  get subTotal() {
-    return this.items.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
-  }
-
-  get vat() {
-    return this.subTotal * 0.1;
-  }
-
-  get total() {
-    return this.subTotal + this.vat - this.discount;
-  }
-
-  // ===== CHECKOUT =====
- saveInvoice() {
-  if (!this.invoiceId) return;
-  
-  const endTime = new Date();
-  
-  this.invoiceService.checkout(this.invoiceId, endTime).subscribe({
-    next: () => {
-      console.log('✅ Invoice checked out');
-      alert('Thanh toán thành công!');
-      // ⭐ QUAY VỀ TRANG TABLES THAY VÌ INVOICES
-      this.router.navigate(['/tables']).then(() => {
-        // Reload lại trang để cập nhật trạng thái bàn
-        window.location.reload();
-      });
-    },
-    error: (err) => {
-      console.error('❌ Error saving invoice:', err);
-      alert('Có lỗi khi lưu hóa đơn');
+  get tables(): ExtendedApiTable[] {
+    let filtered = [...this.allTables];
+    
+    // Filter by area/group
+    if (this.selectedFilter !== 'Tất cả') {
+      filtered = filtered.filter(t => t.area === this.selectedFilter);
     }
-  });
-}
+    
+    // Filter by status
+    if (this.selectedStatus !== 'all') {
+      filtered = filtered.filter(t => t.status === this.selectedStatus);
+    }
+    
+    return filtered;
+  }
+
+  // UI Methods
+  changeTab(tab: 'rooms' | 'menu'): void {
+    this.activeTab = tab;
+  }
+
+  selectFilter(filter: string): void {
+    this.selectedFilter = filter;
+  }
+
+  selectStatus(status: string): void {
+    this.selectedStatus = status;
+  }
+
+  selectTable(table: ExtendedApiTable | null): void {
+    this.selectedTable = table;
+    
+    // Load invoice items if table is serving
+    if (table && table.status === 'serving' && table.invoiceId) {
+      this.loadInvoiceItems(table.invoiceId);
+      this.currentInvoiceId = table.invoiceId;
+    } else {
+      this.orderItems = [];
+      this.currentInvoiceId = null;
+    }
+    
+    if (this.autoOpenMenu && table) {
+      this.activeTab = 'menu';
+    }
+  }
+
+  loadInvoiceItems(invoiceId: number): void {
+    this.invoiceService.getInvoiceItems(invoiceId).subscribe({
+      next: (items) => {
+        this.orderItems = items.map(item => ({
+          id: item.id,
+          name: item.menuItemName || 'Unknown',
+          price: item.unitPrice,
+          quantity: item.quantity,
+          menuItemId: item.menuItemId
+        }));
+      },
+      error: (err) => {
+        console.error('❌ Error loading invoice items:', err);
+      }
+    });
+  }
+
+  // Table operations
+  openTable(table: ExtendedApiTable) {
+    if (table.status === 'empty') {
+      this.pendingTable = table;
+      this.showConfirmDialog = true;
+    } else if (table.status === 'serving') {
+      this.selectTable(table);
+      this.viewCurrentInvoice(table);
+    } else if (table.status === 'reserved') {
+      if (confirm('Bàn này đã được đặt trước. Xác nhận khách đã tới?')) {
+        this.confirmReserved(table);
+      }
+    }
+  }
+
+  confirmOpenTable() {
+    if (this.pendingTable) {
+      this.createNewInvoice(this.pendingTable);
+      this.closeConfirmDialog();
+    }
+  }
+
+  closeConfirmDialog() {
+    this.showConfirmDialog = false;
+    this.pendingTable = null;
+  }
+
+  createNewInvoice(table: ExtendedApiTable) {
+    console.log('🔓 Creating new invoice for table:', table.id);
+
+    this.tableService.openTable(table.id).subscribe({
+      next: (response) => {
+        console.log('✅ Invoice created:', response);
+        table.status = 'serving';
+        this.selectTable(table);
+        this.loadData();
+      },
+      error: (err) => {
+        console.error('❌ Error creating invoice:', err);
+        alert('Không thể mở bàn! ' + (err.error?.message || err.message || ''));
+      }
+    });
+  }
+
+  viewCurrentInvoice(table: ExtendedApiTable) {
+    console.log('👀 Viewing invoice for table:', table.id);
+    this.selectTable(table);
+  }
+
+  confirmReserved(table: ExtendedApiTable) {
+    this.tableService.updateStatus(table.id, 'serving').subscribe({
+      next: () => {
+        console.log('✅ Table status updated to serving');
+        table.status = 'serving';
+        this.selectTable(table);
+        this.loadData();
+      },
+      error: (err) => {
+        console.error('❌ Error confirming table:', err);
+        alert('Không thể xác nhận bàn!');
+      }
+    });
+  }
+
+  getStatusText(status: TableStatus): string {
+    const statusMap = {
+      'empty': 'Trống',
+      'serving': 'Phục vụ',
+      'reserved': 'Đã đặt'
+    };
+    return statusMap[status] || status;
+  }
+
+  getServiceTimeText(table: ExtendedApiTable): string {
+    if (!table.serviceMinutes) return 'Chưa mở';
+    
+    const hours = Math.floor(table.serviceMinutes / 60);
+    const mins = table.serviceMinutes % 60;
+    
+    if (hours > 0) {
+      return `${hours}h ${mins}p`;
+    }
+    return `${mins} phút`;
+  }
+
+  // Order management
+  get totalAmount(): number {
+    return this.orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  }
+
+  get itemCount(): number {
+    return this.orderItems.reduce((sum, item) => sum + item.quantity, 0);
+  }
+
+  addNewItem(): void {
+    console.log('Add new item clicked');
+    // TODO: Open menu item selection dialog
+  }
+
+  addNewOrder(): void {
+    this.orderCount++;
+    console.log('Add new order clicked');
+  }
+
+  refreshOrders(): void {
+    if (this.selectedTable && this.currentInvoiceId) {
+      this.loadInvoiceItems(this.currentInvoiceId);
+    }
+    this.loadData();
+  }
+
+  notify(): void {
+    alert('Thông báo đã được gửi!');
+  }
+
+  payment(): void {
+    if (!this.selectedTable) {
+      alert('Vui lòng chọn bàn trước khi thanh toán!');
+      return;
+    }
+    
+    if (this.orderItems.length === 0) {
+      alert('Chưa có món trong đơn hàng!');
+      return;
+    }
+    
+    if (this.selectedTable.invoiceId) {
+      // Navigate to payment page or show payment dialog
+      this.router.navigate(['/tables', this.selectedTable.id, 'payment']);
+    }
+  }
+
+  addMenuItem(item: OrderItem): void {
+    const existing = this.orderItems.find(i => i.id === item.id);
+    if (existing) {
+      existing.quantity++;
+    } else {
+      this.orderItems.push({ ...item, quantity: 1 });
+    }
+    // TODO: Update invoice in backend
+  }
+
+  removeMenuItem(itemId: number): void {
+    if (confirm('Xóa món này khỏi đơn?')) {
+      this.orderItems = this.orderItems.filter(i => i.id !== itemId);
+      // TODO: Delete invoice item from backend
+    }
+  }
+
+  updateQuantity(itemId: number, quantity: number): void {
+    if (quantity < 1) {
+      this.removeMenuItem(itemId);
+      return;
+    }
+    
+    const item = this.orderItems.find(i => i.id === itemId);
+    if (item) {
+      item.quantity = quantity;
+      // TODO: Update invoice item quantity in backend
+    }
+  }
+
+  trackByGroupId(index: number, g: ExtendedTableGroup): number {
+    return g.id;
+  }
+
+  trackByTableId(index: number, t: ExtendedApiTable): number {
+    return t.id;
+  }
 }

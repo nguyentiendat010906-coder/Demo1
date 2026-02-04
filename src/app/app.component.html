@@ -52,10 +52,6 @@
           <span>Danh mục</span>
         </div>
         <ul class="section-items">
-          <li routerLink="/table-setting" routerLinkActive="active" (click)="closeSidebar()">
-            <i class="bi bi-table"></i>
-            <span>Phòng - Bàn</span>
-          </li>
           <li routerLink="/customers" routerLinkActive="active" (click)="closeSidebar()">
             <i class="bi bi-people"></i>
             <span>Khách hàng</span>
@@ -111,13 +107,14 @@
             <i class="bi bi-printer"></i>
             <span>Mẫu in bill / báo cáo</span>
           </li>
+            <li routerLink="/table-setting" routerLinkActive="active" (click)="closeSidebar()">
+            <i class="bi bi-table"></i>
+            <span>Phòng - Bàn</span>
+          </li>
         </ul>
       </li>
 
     </ul>
-
-    <!-- LOGOUT -->
-    <button class="logout" (click)="logout()">Đăng xuất</button>
 
   </aside>
 
@@ -169,17 +166,25 @@
       <i class="bi bi-bell"></i>
     </span>
 
-    <div class="user-avatar-circle">
-      <img
-        src="https://acman.vn/wp-content/uploads/2023/12/Logo-acman-Favicon.png"
-      />
-    </div>
+<div class="user-avatar-circle" (click)="toggleUserMenu()">
+  <img
+    src="https://acman.vn/wp-content/uploads/2023/12/Logo-acman-Favicon.png"
+  />
+  
+  <div class="user-menu" *ngIf="showUserMenu">
+    <button class="user-menu-item" (click)="logout()">
+      <i class="bi bi-box-arrow-right"></i>
+      <span>Đăng xuất</span>
+    </button>
+  </div>
+</div>
   </div>
 </header>
 
     <!-- CONTENT -->
     <main class="content">
       <router-outlet></router-outlet>
+      <app-notification></app-notification>
     </main>
     
 

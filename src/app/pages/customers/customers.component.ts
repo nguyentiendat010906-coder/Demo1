@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CustomerService } from '../../services/customer.service';
 import { GroupService } from '../../services/group.service';
+import { NotificationService } from '../../services/notification.service';
 import { CustomerModalComponent } from '../../shared/customer-modal/customer-modal.component';
 import { GroupModalComponent } from '../../shared/group-modal/group-modal.component';
 import { Customer } from '../../models/customer';
@@ -32,7 +33,7 @@ export class CustomersComponent implements OnInit {
   // Dữ liệu
   customers: Customer[] = [];
   filteredCustomers: Customer[] = [];
-  selectedCustomer: Customer | null = null;
+  editingCustomer: Customer | null = null; // ← ĐỔI TÊN từ selectedCustomer
   groups: Group[] = [];
   
   // Filter customer
@@ -42,6 +43,7 @@ export class CustomersComponent implements OnInit {
   
   // Modal states
   showModal: boolean = false;
+  showCustomerModal: boolean = false; // ← THÊM biến này
   editingGroup: any = null;
   
   // Math for template
@@ -59,23 +61,15 @@ export class CustomersComponent implements OnInit {
   
   // Column visibility
   showColumnPanel = false;
-  visibleColumns: VisibleColumns = {
-    group: true,
-    code: true,
-    name: true,
-    taxCode: true,
-    cccd: true,
-    phone: true,
-    address: true,
-    email: true
-  };
+  visibleColumns: VisibleColumns = this.loadVisibleColumns();
 
   // Custom dropdown
   showGroupDropdown = false;
 
   constructor(
     private customerService: CustomerService,
-    private groupService: GroupService
+    private groupService: GroupService,
+    private notification: NotificationService
   ) {}
 
   ngOnInit() {
@@ -84,36 +78,45 @@ export class CustomersComponent implements OnInit {
   }
 
   loadCustomers() {
-    this.customerService.getAllCustomers().subscribe({
-      next: (data) => {
-        this.customers = data;
-        this.filteredCustomers = data;
-        this.totalItems = data.length;
-      },
-      error: (err) => {
-        console.error('Lỗi tải dữ liệu:', err);
-        alert('Không thể tải danh sách khách hàng!');
-      }
-    });
-  }
-
-loadGroups() {
-  // Chỉ lấy customer groups
-  this.groupService.getAllGroups('customer').subscribe({
+  this.customerService.getAllCustomers().subscribe({
     next: (data) => {
-      this.groups = data;
+      this.customers = data;
+      
+      // ✅ Sắp xếp theo mã nhóm (group) tăng dần
+      this.customers.sort((a, b) => {
+        const groupA = a.group || '';
+        const groupB = b.group || '';
+        return groupA.localeCompare(groupB, undefined, { numeric: true });
+      });
+      
+      this.filteredCustomers = [...this.customers];
+      this.totalItems = data.length;
     },
+    
     error: (err) => {
-      console.error('Lỗi tải nhóm:', err);
+      console.error('Lỗi tải dữ liệu:', err);
+      this.notification.error('Không thể tải danh sách khách hàng!');
     }
   });
 }
+
+  loadGroups() {
+    this.groupService.getAllGroups('customer').subscribe({
+      next: (data) => {
+        this.groups = data;
+      },
+      error: (err) => {
+        console.error('Lỗi tải nhóm:', err);
+        this.notification.error('Không thể tải danh sách nhóm!');
+      }
+    });
+  }
 
   // Filter functions
   applyFilter() {
     let result = [...this.customers];
     
-    if (this.filterCustomer.groupID !== null && this.filterCustomer.groupID !== undefined) {
+    if (this.filterCustomer.groupID != null) {
       const groupId = Number(this.filterCustomer.groupID);
       result = result.filter(c => Number(c.groupID) === groupId);
     }
@@ -144,7 +147,6 @@ loadGroups() {
   }
 
   clearFilter() {
-    this.selectedYear = '2026';
     this.filterCustomer.groupID = null;
     this.searchType = 'name';
     this.searchKeyword = '';
@@ -206,95 +208,132 @@ loadGroups() {
 
   // CUSTOMER CRUD
   viewDetail(customer: Customer) {
-    this.selectedCustomer = { ...customer };
+    this.editingCustomer = { ...customer };
+    this.showCustomerModal = true;
   }
 
   createNew() {
-    this.selectedCustomer = {
-      id: 0,
-      groupID: undefined,
-      code: '',
-      name: '',
-      taxCode: '',
-      cccd: '',
-      phone: '',
-      address: '',
-      email: ''
-    };
+    this.editingCustomer = null; // null để tạo mới
+    this.showCustomerModal = true;
   }
 
   closeModal() {
-    this.selectedCustomer = null;
+    this.editingCustomer = null;
+    this.showCustomerModal = false;
   }
 
-  saveCustomer(customer: Customer) {
+  async saveCustomer(customer: Customer) {
     if (!customer) return;
 
-    if (!customer.name?.trim()) {
-      alert('Vui lòng nhập tên khách hàng!');
+    if (!customer.name || !customer.name.trim()) {
+      this.notification.warning('Vui lòng nhập tên khách hàng!');
       return;
     }
 
-    if (customer.id === 0) {
+    if (customer.id === 0 || !customer.id) {
+      // XÁC NHẬN TẠO MỚI
+      const confirmed = await this.notification.confirm({
+        title: 'Xác nhận tạo mới',
+        message: `Bạn có chắc muốn tạo khách hàng "${customer.name}"?`,
+        confirmText: 'Tạo mới',
+        cancelText: 'Hủy'
+      });
+
+      if (!confirmed) return;
+
       this.customerService.createCustomer(customer).subscribe({
         next: () => {
-          alert('Đã tạo mới khách hàng!');
+          this.notification.success('Đã tạo mới khách hàng thành công!');
           this.closeModal();
           this.loadCustomers();
         },
-        error: () => alert('Có lỗi khi tạo mới!')
+        error: () => this.notification.error('Có lỗi khi tạo mới khách hàng!')
       });
     } else {
+      // XÁC NHẬN CẬP NHẬT
+      const confirmed = await this.notification.confirm({
+        title: 'Xác nhận cập nhật',
+        message: `Bạn có chắc muốn cập nhật thông tin khách hàng "${customer.name}"?`,
+        confirmText: 'Cập nhật',
+        cancelText: 'Hủy'
+      });
+
+      if (!confirmed) return;
+
       this.customerService.updateCustomer(customer.id, customer).subscribe({
         next: () => {
-          alert('Đã cập nhật khách hàng!');
+          this.notification.success('Đã cập nhật khách hàng thành công!');
           this.closeModal();
           this.loadCustomers();
         },
-        error: () => alert('Có lỗi khi cập nhật!')
+        error: () => this.notification.error('Có lỗi khi cập nhật khách hàng!')
       });
     }
   }
 
-  deleteCustomer(customer: Customer) {
-    if (!confirm(`Bạn có chắc muốn xóa khách hàng "${customer.name}"?`)) return;
+  async deleteCustomer(customer: Customer) {
+    // XÁC NHẬN XÓA KHÁCH HÀNG
+    const confirmed = await this.notification.confirm({
+      title: 'Xác nhận xóa',
+      message: `Bạn có chắc muốn xóa khách hàng "${customer.name}"?`,
+      confirmText: 'Xóa',
+      cancelText: 'Hủy'
+    });
+
+    if (!confirmed) return;
     
     this.customerService.deleteCustomer(customer.id).subscribe({
       next: () => {
-        alert('Đã xóa khách hàng!');
+        this.notification.success('Đã xóa khách hàng thành công!');
         this.loadCustomers();
       },
-      error: () => alert('Có lỗi xảy ra khi xóa!')
+      error: () => this.notification.error('Có lỗi xảy ra khi xóa khách hàng!')
     });
   }
 
-  toggleColumnPanel(event: MouseEvent) {
-    event.stopPropagation();
-    this.showColumnPanel = !this.showColumnPanel;
-  }
+
+toggleColumnPanel(event: MouseEvent) {
+  event.stopPropagation();
+  const currentState = this.showColumnPanel;
+  this.closeAllDropdowns();
+  this.showColumnPanel = !currentState;
+}
+
+toggleGroupDropdown() {
+  const currentState = this.showGroupDropdown;
+  this.closeAllDropdowns();
+  this.showGroupDropdown = !currentState;
+}
+
+toggleSearchTypeDropdown() {
+  const currentState = this.showSearchTypeDropdown;
+  this.closeAllDropdowns();
+  this.showSearchTypeDropdown = !currentState;
+}
+
+private closeAllDropdowns(): void {
+  this.showGroupDropdown = false;
+  this.showSearchTypeDropdown = false;
+  this.showColumnPanel = false;
+}
+
+
 
   // ===== GROUP MANAGEMENT =====
   
-  // Custom dropdown methods
   getSelectedGroupText(): string {
-    if (this.filterCustomer.groupID === null || this.filterCustomer.groupID === undefined) {
+    if (this.filterCustomer.groupID == null) {
       return 'Tất cả';
     }
     const selected = this.groups.find(g => g.id === this.filterCustomer.groupID);
     return selected ? `${selected.code} - ${selected.name}` : 'Tất cả';
   }
-
-  toggleGroupDropdown() {
-    this.showGroupDropdown = !this.showGroupDropdown;
-  }
-
   selectGroup(groupId: number | null) {
     this.filterCustomer.groupID = groupId;
     this.showGroupDropdown = false;
     this.applyFilter();
   }
 
-  // Modal methods
   openGroupModal() {
     this.editingGroup = null;
     this.showModal = true;
@@ -316,15 +355,23 @@ loadGroups() {
     this.editingGroup = null;
   }
 
-  handleSubmit(data: any) {
+  async handleSubmit(data: any) {
     if (this.editingGroup) {
-      // Cập nhật nhóm
+      // XÁC NHẬN CẬP NHẬT NHÓM
+      const confirmed = await this.notification.confirm({
+        title: 'Xác nhận cập nhật nhóm',
+        message: `Bạn có chắc muốn cập nhật nhóm "${this.editingGroup.name}"?`,
+        confirmText: 'Cập nhật',
+        cancelText: 'Hủy'
+      });
+
+      if (!confirmed) return;
+
       this.groupService.updateGroup(this.editingGroup.id, data).subscribe({
         next: () => {
-          alert('Đã cập nhật nhóm!');
+          this.notification.success('Đã cập nhật nhóm thành công!');
           this.loadGroups();
           
-          // Refresh groups trong customer modal nếu đang mở
           if (this.customerModalRef) {
             this.customerModalRef.refreshGroups();
           }
@@ -337,17 +384,25 @@ loadGroups() {
           if (err.error?.Message || err.error?.message) {
             errorMessage = err.error.Message || err.error.message;
           }
-          alert(errorMessage);
+          this.notification.error(errorMessage);
         }
       });
     } else {
-      // Tạo mới nhóm
+      // XÁC NHẬN TẠO MỚI NHÓM
+      const confirmed = await this.notification.confirm({
+        title: 'Xác nhận tạo nhóm',
+        message: `Bạn có chắc muốn tạo nhóm "${data.name}"?`,
+        confirmText: 'Tạo mới',
+        cancelText: 'Hủy'
+      });
+
+      if (!confirmed) return;
+
       this.groupService.createGroup(data).subscribe({
         next: () => {
-          alert('Đã tạo nhóm mới thành công!');
+          this.notification.success('Đã tạo nhóm mới thành công!');
           this.loadGroups();
           
-          // Refresh groups trong customer modal nếu đang mở
           if (this.customerModalRef) {
             this.customerModalRef.refreshGroups();
           }
@@ -360,23 +415,28 @@ loadGroups() {
           if (err.error?.Message || err.error?.message) {
             errorMessage = err.error.Message || err.error.message;
           }
-          alert(errorMessage);
+          this.notification.error(errorMessage);
         }
       });
     }
   }
 
-  handleUpdateGroup(data: any) {
-    this.handleSubmit(data);
-  }
+  async handleDeleteGroup(group: any) {
+    // XÁC NHẬN XÓA NHÓM
+    const confirmed = await this.notification.confirm({
+      title: 'Xác nhận xóa nhóm',
+      message: `Bạn có chắc muốn xóa nhóm "${group.name}"?`,
+      confirmText: 'Xóa',
+      cancelText: 'Hủy'
+    });
 
-  handleDeleteGroup(group: any) {
+    if (!confirmed) return;
+
     this.groupService.deleteGroup(group.id).subscribe({
       next: () => {
-        alert('Đã xóa nhóm!');
+        this.notification.success('Đã xóa nhóm thành công!');
         this.loadGroups();
         
-        // Refresh groups trong customer modal nếu đang mở
         if (this.customerModalRef) {
           this.customerModalRef.refreshGroups();
         }
@@ -393,17 +453,67 @@ loadGroups() {
         if (err.error?.Message || err.error?.message) {
           errorMessage = err.error.Message || err.error.message;
         }
-        alert(errorMessage);
+        this.notification.error(errorMessage);
       }
     });
   }
 
-  // Đóng dropdown khi click ra ngoài
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.custom-group-select')) {
-      this.showGroupDropdown = false;
+ @HostListener('document:click', ['$event'])
+onDocumentClick(event: MouseEvent) {
+  const target = event.target as HTMLElement;
+  
+  // Kiểm tra xem click có nằm trong bất kỳ dropdown nào không
+  const isInsideGroup = target.closest('.custom-group-select');
+  const isInsideColumn = target.closest('.column-toggle-wrapper');
+  
+  if (!isInsideGroup && !isInsideColumn) {
+    this.closeAllDropdowns();
+  }
+}
+  showSearchTypeDropdown = false;
+
+selectSearchType(type: string): void {
+  this.searchType = type;
+  this.showSearchTypeDropdown = false;
+}
+
+getSearchTypeText(): string {
+  const map: { [key: string]: string } = {
+    'name': 'Tên khách hàng',
+    'taxCode': 'MST',
+    'address': 'Địa chỉ',
+    'phone': 'Điện thoại',
+    'cccd': 'CCCD'
+  };
+  return map[this.searchType] || 'Tên khách hàng';
+}
+// Load visible columns from localStorage
+private loadVisibleColumns(): VisibleColumns {
+  const saved = localStorage.getItem('customer_visible_columns');
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      console.error('Error loading visible columns:', e);
     }
   }
+  
+  // Default values nếu chưa có trong localStorage
+  return {
+    group: true,
+    code: true,
+    name: true,
+    taxCode: true,
+    cccd: true,
+    phone: true,
+    address: true,
+    email: true
+  };
+}
+
+// Save visible columns to localStorage
+saveVisibleColumns(): void {
+  localStorage.setItem('customer_visible_columns', JSON.stringify(this.visibleColumns));
+}
+
 }

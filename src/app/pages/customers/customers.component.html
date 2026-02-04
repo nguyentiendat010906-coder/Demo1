@@ -17,14 +17,14 @@
 
     <!-- PANEL ẨN / HIỆN CỘT -->
     <div class="column-panel" *ngIf="showColumnPanel">
-      <label><input type="checkbox" [(ngModel)]="visibleColumns.group"> Nhóm</label>
-      <label><input type="checkbox" [(ngModel)]="visibleColumns.code"> Mã</label>
-      <label><input type="checkbox" [(ngModel)]="visibleColumns.name"> Tên</label>
-      <label><input type="checkbox" [(ngModel)]="visibleColumns.taxCode"> Mã số thuế</label>
-      <label><input type="checkbox" [(ngModel)]="visibleColumns.cccd"> CCCD</label>
-      <label><input type="checkbox" [(ngModel)]="visibleColumns.phone"> Điện thoại</label>
-      <label><input type="checkbox" [(ngModel)]="visibleColumns.address"> Địa chỉ</label>
-      <label><input type="checkbox" [(ngModel)]="visibleColumns.email"> Email</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.group" (change)="saveVisibleColumns()"> Nhóm</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.code" (change)="saveVisibleColumns()"> Mã</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.name" (change)="saveVisibleColumns()"> Tên</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.taxCode" (change)="saveVisibleColumns()"> Mã số thuế</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.cccd" (change)="saveVisibleColumns()"> CCCD</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.phone" (change)="saveVisibleColumns()"> Điện thoại</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.address" (change)="saveVisibleColumns()"> Địa chỉ</label>
+      <label><input type="checkbox" [(ngModel)]="visibleColumns.email" (change)="saveVisibleColumns()"> Email</label>
     </div>
   </div>
 
@@ -95,16 +95,33 @@
 
 
 
-      <div class="filter-item">
-        <label>Tìm theo</label>
-        <select class="form-input" [(ngModel)]="searchType">
-          <option value="name">Tên khách hàng</option>
-          <option value="taxCode">MST</option>
-          <option value="address">Địa chỉ</option>
-          <option value="phone">Điện thoại</option>
-          <option value="cccd">CCCD</option>
-        </select>
+<div class="filter-item">
+  <label>Tìm theo</label>
+  <div class="custom-group-select" [class.open]="showSearchTypeDropdown">
+    <div class="select-header" (click)="toggleSearchTypeDropdown()">
+      <span class="selected-value">{{ getSearchTypeText() }}</span>
+      <i class="pi pi-angle-down select-arrow"></i>
+    </div>
+
+    <div class="select-options" *ngIf="showSearchTypeDropdown">
+      <div class="select-option" (click)="selectSearchType('name')">
+        <span class="option-text">Tên khách hàng</span>
       </div>
+      <div class="select-option" (click)="selectSearchType('taxCode')">
+        <span class="option-text">MST</span>
+      </div>
+      <div class="select-option" (click)="selectSearchType('address')">
+        <span class="option-text">Địa chỉ</span>
+      </div>
+      <div class="select-option" (click)="selectSearchType('phone')">
+        <span class="option-text">Điện thoại</span>
+      </div>
+      <div class="select-option" (click)="selectSearchType('cccd')">
+        <span class="option-text">CCCD</span>
+      </div>
+    </div>
+  </div>
+</div>
 
       <div class="filter-item filter-search">
         <label>&nbsp;</label>
@@ -129,12 +146,12 @@
         <thead>
           <tr>
             <th class="col-actions"></th>
-            <th *ngIf="visibleColumns.group">Nhóm</th>
-            <th *ngIf="visibleColumns.code">Mã</th>
-            <th *ngIf="visibleColumns.name">Tên</th>
-            <th *ngIf="visibleColumns.taxCode">Mã số thuế</th>
-            <th *ngIf="visibleColumns.cccd">Số CCCD</th>
-            <th *ngIf="visibleColumns.phone">Điện thoại</th>
+            <th *ngIf="visibleColumns.group" style="width: 60px;">Nhóm</th>
+            <th *ngIf="visibleColumns.code" style="width: 60px;">Mã</th>
+            <th *ngIf="visibleColumns.name" style="width: 300px;">Tên</th>
+            <th *ngIf="visibleColumns.taxCode" style="width: 100px;">Mã số thuế</th>
+            <th *ngIf="visibleColumns.cccd" style="width: 100px;">Số CCCD</th>
+            <th *ngIf="visibleColumns.phone" style="width: 100px;">Điện thoại</th>
             <th *ngIf="visibleColumns.address">Địa chỉ</th>
             <th *ngIf="visibleColumns.email">Email</th>
           </tr>
@@ -202,9 +219,8 @@
 
 <!-- Modal Edit Customer -->
 <app-customer-modal
-  *ngIf="selectedCustomer"
-  [visible]="true"
-  [customer]="selectedCustomer"
+  [visible]="showCustomerModal"
+  [editingCustomer]="editingCustomer"
   (close)="closeModal()"
   (save)="saveCustomer($event)"
   (openGroupModal)="openGroupModalFromCustomer()">

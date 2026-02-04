@@ -37,7 +37,7 @@ export class OverviewComponent implements OnInit {
 
       products.forEach(p => {
         const price = Number(p.price);
-        const qty = Number(p.quantity ?? 1);
+        const qty = Number(p.stock ?? 1);
 
         this.totalRevenue += price * qty;
         this.cashAmount += price * qty;

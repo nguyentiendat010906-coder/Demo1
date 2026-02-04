@@ -1,0 +1,32 @@
+<div class="notification-container">
+  <div *ngFor="let notification of notifications" 
+       class="notification notification-{{notification.type}}">
+    <div class="notification-icon">
+      <span *ngIf="notification.type === 'success'">✓</span>
+      <span *ngIf="notification.type === 'error'">✕</span>
+      <span *ngIf="notification.type === 'warning'">⚠</span>
+      <span *ngIf="notification.type === 'info'">ℹ</span>
+    </div>
+    <div class="notification-message">{{ notification.message }}</div>
+    <button class="notification-close" (click)="remove(notification.id)">×</button>
+  </div>
+</div>
+
+<div *ngIf="confirmData" class="confirm-overlay" (click)="cancelConfirm()">
+  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+    <div class="confirm-header">
+      <h3>{{ confirmData.title }}</h3>
+    </div>
+    <div class="confirm-body">
+      <p>{{ confirmData.message }}</p>
+    </div>
+    <div class="confirm-footer">
+      <button class="btn-cancel" (click)="cancelConfirm()">
+        {{ confirmData.cancelText || 'Hủy' }}
+      </button>
+      <button class="btn-confirm" (click)="acceptConfirm()">
+        {{ confirmData.confirmText || 'Xác nhận' }}
+      </button>
+    </div>
+  </div>
+</div>

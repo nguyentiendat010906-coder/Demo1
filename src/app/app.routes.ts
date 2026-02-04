@@ -1,3 +1,5 @@
+// CÁCH 3: Import trực tiếp (ĐƠN GIẢN NHẤT)
+
 import { Routes } from '@angular/router';
 import { OverviewComponent } from './pages/overview/overview.component';
 import { ProductsComponent } from './pages/products/products.component';
@@ -8,33 +10,29 @@ import { InvoicesComponent } from './pages/invoices/invoices.component';
 import { TablesComponent } from './pages/tables/tables.component';
 import { TableSettingComponent } from './pages/table-setting/table-setting.component';
 
+// ✅ THÊM IMPORT TRỰC TIẾP
+import { TableInvoiceComponent } from './pages/table-invoice/table-invoice.component';
+// HOẶC nếu đã đổi tên:
+// import { TablesComponent as TableInvoiceComponent } from './pages/table-invoice/table-invoice.component';
 
-// ✅ Sửa lại app.routes.ts
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-
   { path: 'overview', component: OverviewComponent },
   { path: 'products', component: ProductsComponent },
   { path: 'customers', component: CustomersComponent },
   { path: 'invoices', component: InvoicesComponent },
   { path: 'tables', component: TablesComponent },
   
-  
-  // ✅ Đổi :tableId → :id
+  // ✅ SỬA THÀNH IMPORT TRỰC TIẾP
   {
     path: 'tables/:id/invoice',
-    loadComponent: () =>
-      import('./pages/table-invoice/table-invoice.component')
-        .then(m => m.TableInvoiceComponent)
+    component: TableInvoiceComponent  // ⬅️ ĐƠN GIẢN HƠN
   },
+  
   {
-  path: 'table-setting',
-  loadComponent: () =>
-    import('./pages/table-setting/table-setting.component')
-      .then(m => m.TableSettingComponent)
-}
-
+    path: 'table-setting',
+    component: TableSettingComponent  // Có thể sửa thành import trực tiếp luôn
+  }
 ];

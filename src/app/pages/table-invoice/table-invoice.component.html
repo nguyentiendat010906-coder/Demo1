@@ -1,150 +1,190 @@
-<div class="pos-layout">
+<div class="main-area">
+    <!-- Left Panel -->
+    <div class="panel-wrapper">
+        <div class="panel">
+            <!-- Panel Header -->
+            <div class="panel-header">
+                <button class="nav-tab" 
+                        (click)="changeTab('rooms')" 
+                        [class.active]="activeTab === 'rooms'">
+                    <i class="fa-solid fa-table-cells-large"></i>
+                    Phòng bàn
+                </button>
+                <button class="nav-tab" 
+                        (click)="changeTab('menu')" 
+                        [class.active]="activeTab === 'menu'">
+                    <i class="fa-solid fa-utensils"></i>
+                    Thực đơn
+                </button>
+                <div class="header-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" 
+                           placeholder="Tìm món (F3)" 
+                           [(ngModel)]="searchQuery">
+                </div>
+                <button class="action-btn">
+                    <i class="fa-solid fa-bolt"></i>
+                </button>
+                <button class="action-btn" (click)="addNewItem()">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
 
-  <!-- ===================== MENU PANEL ===================== -->
-  <div class="menu-panel">
-    <h3 class="panel-title">Danh sách sản phẩm</h3>
-    
-    <!-- FILTER CONTROLS -->
-    <div class="menu-filters">
-      <!-- Search -->
-      <div class="filter-search">
-        <span class="search-icon">🔍</span>
-        <input 
-          type="text" 
-          [(ngModel)]="searchText" 
-          (ngModelChange)="onSearchChange()"
-          placeholder="Quét mã vạch hoặc tìm tên sản phẩm...">
-      </div>
-      
-      <!-- Category Tabs -->
-      <div class="filter-tabs">
-        <button 
-          class="filter-tab"
-          [class.active]="selectedCategory === 'all'"
-          (click)="selectedCategory = 'all'; onCategoryChange()">
-          🍽️ Tất cả
-        </button>
-        <button 
-          *ngFor="let cat of categories"
-          [hidden]="cat === 'all'"
-          class="filter-tab"
-          [class.active]="selectedCategory === cat"
-          (click)="selectedCategory = cat; onCategoryChange()">
-          {{ cat === 'Bếp' ? '🍳' : cat === 'Bar' ? '🍹' : '📦' }} {{ cat }}
-        </button>
-      </div>
-    </div>
-    
-    <!-- MENU LIST -->
-    <div class="menu-list">
-      <div class="menu-item"
-           *ngFor="let m of filteredMenu"
-           (click)="addItem(m)">
-        <div class="menu-item-image">
-          {{ m.category === 'Bếp' ? '🍳' : m.category === 'Bar' ? '🍹' : '📦' }}
-          <span class="menu-item-stock">x{{ m.stock || 15 }}</span>
-        </div>
-        <div class="menu-item-info">
-          <div class="menu-name">{{ m.name }}</div>
-          <div class="menu-price">{{ m.price | number }}đ</div>
-        </div>
-      </div>
-      
-      <!-- Empty state -->
-      <div *ngIf="filteredMenu.length === 0" class="menu-empty" style="grid-column: 1/-1;">
-        <p>❌ Không tìm thấy sản phẩm nào</p>
-      </div>
-    </div>
-  </div>
+            <!-- Filter Toolbar -->
+            <div class="filter-toolbar">
+                <button class="filter-btn" 
+                        *ngFor="let filter of filters"
+                        [class.inactive]="selectedFilter !== filter"
+                        (click)="selectFilter(filter)">
+                    {{filter}}
+                </button>
+                <div class="toolbar-icons">
+                    <i class="fa-solid fa-table-cells-large"></i>
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+            </div>
 
-  <!-- ===================== INVOICE PANEL ===================== -->
-  <div class="invoice-panel">
+            <!-- Status Row -->
+            <div class="status-row">
+                <div class="status-item" 
+                     *ngFor="let status of statusList"
+                     [class.active]="selectedStatus === status.key"
+                     (click)="selectStatus(status.key)">
+                    <i [class]="status.icon"></i>
+                    {{status.label}}
+                </div>
+            </div>
 
-    <!-- HEADER -->
-    <div class="invoice-header">
-      <div class="header-left">
-        <h3>{{ tableName || 'Đơn hàng #' + tableId }}</h3>
-        <div>⏰ Giờ vào: {{ startTime | date:'HH:mm dd/MM/yyyy' }}</div>
-        <div>👤 Thu ngân: <b>{{ cashier }}</b></div>
-      </div>
+            <!-- Table Area -->
+            <div class="table-area">
+                <div class="table-grid">
+                    <!-- Takeaway option -->
+                    <div class="table-card takeaway" (click)="selectTable(null)">
+                        <i class="fa-solid fa-bag-shopping" style="font-size:30px;"></i>
+                        <span style="font-size:14px; font-weight: 500;">Mang về</span>
+                    </div>
+                    
+                    <!-- Tables -->
+                    <div class="table-card" 
+                         *ngFor="let table of tables"
+                         [class.active]="selectedTable?.id === table.id"
+                         (click)="selectTable(table)">
+                        <div class="table-icon"></div>
+                        <b style="font-size:14px;" 
+                           [style.color]="selectedTable?.id === table.id ? 'white' : '#64748b'">
+                            {{table.name}}
+                        </b>
+                    </div>
+                </div>
+            </div>
 
-      <div class="header-right">
-        <div class="time">
-          <div>⏱️ Phục vụ: {{ serviceMinutes }} phút</div>
+            <!-- Panel Footer -->
+            <div class="panel-footer">
+                <input type="checkbox" 
+                       id="auto-menu" 
+                       [(ngModel)]="autoOpenMenu">
+                <label for="auto-menu">Mở thực đơn khi chọn bàn</label>
+            </div>
         </div>
-        <div class="grand-total">
-          {{ total | number }}đ
-        </div>
-      </div>
-    </div>
-
-    <!-- CUSTOMER INFO -->
-    <div class="customer-info">
-      <div class="customer-display">
-        <h4>👤 Thông tin khách hàng</h4>
-        <div class="customer-details" *ngIf="customerName || customerPhone">
-          <span><strong>{{ customerName || 'Khách lẻ' }}</strong></span>
-          <span *ngIf="customerPhone">📞 {{ customerPhone }}</span>
-        </div>
-        <div class="customer-details" *ngIf="!customerName && !customerPhone">
-          <span class="empty">Chưa có thông tin khách hàng</span>
-        </div>
-      </div>
-      <button class="add-customer-btn" (click)="openCustomerModal()">
-        {{ customerName ? '✏️ Sửa' : '➕ Thêm' }}
-      </button>
     </div>
 
-    <!-- ITEMS -->
-    <div class="invoice-items">
-      <div class="item-row" *ngFor="let i of items">
-        <div class="item-name">{{ i.productName }}</div>
+    <!-- Right Panel -->
+    <div class="panel-wrapper">
+        <div class="panel">
+            <!-- Panel Header -->
+            <div class="panel-header">
+                <div class="tab-badge">
+                    {{orderCount}}-38 <i class="fa-solid fa-xmark"></i>
+                </div>
+                <button class="action-btn" (click)="addNewOrder()">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <div class="header-icons">
+                    <i class="fa-solid fa-volume-high"></i>
+                    <i class="fa-solid fa-bell"></i>
+                    <i class="fa-solid fa-rotate" (click)="refreshOrders()"></i>
+                    <i class="fa-solid fa-print"></i>
+                    <i class="fa-solid fa-user-circle"></i>
+                    <i class="fa-solid fa-bars"></i>
+                </div>
+            </div>
 
-        <div class="qty-control">
-          <button (click)="decrease(i)">−</button>
-          <span class="qty">{{ i.quantity }}</span>
-          <button (click)="increase(i)">+</button>
+            <!-- Order Toolbar -->
+            <div class="order-toolbar">
+                <div class="table-info" *ngIf="selectedTable">
+                    <i class="fa-solid fa-table-cells"></i>
+                    {{selectedTable.name}} / {{selectedTable.area}}
+                </div>
+                <div class="table-info" *ngIf="!selectedTable">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    Mang về
+                </div>
+                <div class="search-customer">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" 
+                           placeholder="Tìm khách hàng (F4)" 
+                           [(ngModel)]="customerSearch">
+                </div>
+                <i class="fa-solid fa-plus"></i>
+                <i class="fa-solid fa-basket-shopping"></i>
+                <i class="fa-solid fa-bars"></i>
+            </div>
+
+            <!-- Empty Order State -->
+            <div class="empty-order" *ngIf="orderItems.length === 0">
+                <i class="fa-solid fa-receipt"></i>
+                <p>Chưa có món trong đơn</p>
+                <p>Vui lòng chọn món trong thực đơn bên trái màn hình</p>
+            </div>
+
+            <!-- Order Items List (khi có món) -->
+            <div class="order-list" *ngIf="orderItems.length > 0">
+                <div class="order-item" *ngFor="let item of orderItems">
+                    <div class="item-info">
+                        <span class="item-name">{{item.name}}</span>
+                        <span class="item-price">{{item.price | number:'1.0-0'}} đ</span>
+                    </div>
+                    <div class="item-controls">
+                        <button (click)="updateQuantity(item.id, item.quantity - 1)">-</button>
+                        <span>{{item.quantity}}</span>
+                        <button (click)="updateQuantity(item.id, item.quantity + 1)">+</button>
+                        <button (click)="removeMenuItem(item.id)" class="remove-btn">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Footer -->
+            <div class="action-footer">
+                <div class="total-row">
+                    <div class="total-label">
+                        Tổng tiền
+                        <span class="item-count">{{itemCount}}</span>
+                    </div>
+                    <div class="total-amount">{{totalAmount | number:'1.0-0'}}</div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-action btn-notify" (click)="notify()">
+                        <i class="fa-solid fa-bell"></i>
+                        Thông báo (F10)
+                    </button>
+                    <button class="btn-action btn-payment" (click)="payment()">
+                        <i class="fa-solid fa-dollar-sign"></i>
+                        THANH TOÁN (F9)
+                    </button>
+                </div>
+            </div>
         </div>
-
-        <div class="item-price">
-          {{ i.unitPrice * i.quantity | number }}đ
-        </div>
-
-        <button class="remove" (click)="remove(i)">✕</button>
-      </div>
     </div>
-
-    <!-- SUMMARY -->
-    <div class="summary">
-      <div class="line">
-        <span>Tạm tính</span>
-        <span>{{ subTotal | number }}đ</span>
-      </div>
-      <div class="line">
-        <span>VAT (10%)</span>
-        <span>{{ vat | number }}đ</span>
-      </div>
-      <div class="line total">
-        <b>Tổng thanh toán</b>
-        <b>{{ total | number }}đ</b>
-      </div>
-
-      <button class="pay" [disabled]="items.length === 0" (click)="saveInvoice()">
-        Thanh toán
-      </button>
-    </div>
-
-  </div>
 </div>
 
-<!-- ===================== CUSTOMER MODAL ===================== -->
-<app-customer-modal
-  [visible]="showCustomerModal"
-  [customer]="customer"
-  (close)="closeCustomerModal()"
-  (save)="saveCustomerInfo($event)">
-</app-customer-modal>
-
-
-    
-  
+<!-- Bottom Info -->
+<div class="bottom-info">
+    <div class="bottom-left">
+        <span><i class="fa-solid fa-phone"></i> Hỗ trợ 1900 6522</span>
+        <span><i class="fa-solid fa-location-dot"></i> Chi nhánh trung tâm</span>
+        <span><i class="fa-regular fa-clock"></i> Phiên tắt</span>
+    </div>
+    <div>Phiên bản 26.1.17 - Angular</div>
+</div>

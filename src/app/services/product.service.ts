@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../models/product';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -26,8 +27,16 @@ export class ProductService {
   updateProduct(id: number, product: Product): Observable<Product> {
     return this.http.put<Product>(`${this.apiUrl}/${id}`, product);
   }
+  
 
   deleteProduct(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+  createProductWithFile(formData: FormData): Observable<any> {
+  return this.http.post(`${this.apiUrl}/upload`, formData);
+}
+
+updateProductWithFile(id: number, formData: FormData): Observable<any> {
+  return this.http.put(`${this.apiUrl}/upload/${id}`, formData);
+}
 }

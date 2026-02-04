@@ -1,26 +1,14 @@
-// src/app/models/product.ts
 export interface Product {
   id: number;
-  category: string;
-  code: string;
+  groupID?: number;
+  group?: string;       // ← Mã nhóm (N01, N02, ...)
+  groupName?: string;   // ← Tên nhóm
+  code?: string;        // ← Mã sản phẩm (00010, 00011, ...)
   name: string;
   price: number;
-  unit: string;
-  unitType?: "Số lượng" | "Thời gian"; // Định nghĩa rõ kiểu
-  stock: number;
-  quantity?: number;
-}
-
-export interface Category {
-  id: number;
-  code: string;
-  name: string;
-}
-
-export interface CartItem extends Product {
-  quantity: number;
-}
-
-export interface OrderItem extends Product {
-  quantity: number;
+  stock?: number;
+  category: string;
+  unitType: string;
+  unitTypeId: number;
+  imageUrl?: string;
 }
