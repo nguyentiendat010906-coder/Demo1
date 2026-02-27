@@ -79,6 +79,7 @@ body {
   border: 1px solid #dbe3ef;
   border-radius: 4px;
   overflow: visible;
+  overflow-y: auto;
 }
 
 /* Filter Bar */
@@ -177,6 +178,7 @@ body {
 
 /* Ẩn scrollbar cho table container */
 .table-container {
+  
   overflow-x: auto;
   overflow-y: auto;
   background: white;

@@ -2,159 +2,194 @@
     <!-- Left Panel -->
     <div class="panel-wrapper">
         <div class="panel">
-        
-     <!-- Panel Header -->
-<div class="panel-header">
-    <button class="nav-tab" 
-            (click)="changeTab('rooms')" 
-            [class.active]="activeTab === 'rooms'">
-        <i class="fa-solid fa-table-cells-large"></i>
-        Phòng bàn
-    </button>
-   <button class="nav-tab" 
-            (click)="changeTab('menu')" 
-            [class.active]="activeTab === 'menu'">
-        <i class="fa-solid fa-utensils"></i>
-        Thực đơn
-    </button>
-    
-    
-<!-- ✅ THAY THẾ PHẦN header-search CŨ BẰNG CODE NÀY -->
+            <!-- ===== PANEL HEADER KIỂU KIOTVIET ===== -->
+            <div class="panel-header">
+                <div class="header-left">
+                    <!-- Nút quay lại -->
+                    <div class="header-icons">
+                        <button class="back-btn" (click)="goBack()" title="Quay lại">
+                            <i class="pi pi-home"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- KV Tabs -->
+                    <div class="kv-tabs">
+                        <ul>
+                            <!-- Tab Phòng bàn -->
+                            <li [class.active]="activeTab === 'rooms'">
+                                <button class="nav-tab" (click)="changeTab('rooms')">
+                                    <span class="menu-content">
+                                        <span class="btn-icon btn-icon-min">
+                                            <svg fill="none" height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                <path clip-rule="evenodd" d="M6 4.5C5.17157 4.5 4.5 5.17157 4.5 6V10C4.5 10.8284 5.17157 11.5 6 11.5H10C10.8284 11.5 11.5 10.8284 11.5 10V6C11.5 5.17157 10.8284 4.5 10 4.5H6ZM3 6C3 4.34315 4.34315 3 6 3H10C11.6569 3 13 4.34315 13 6V10C13 11.6569 11.6569 13 10 13H6C4.34315 13 3 11.6569 3 10V6Z" fill-rule="evenodd"></path>
+                                                <path clip-rule="evenodd" d="M6 0C5.44772 0 5 0.447715 5 1C5 1.55228 5.44772 2 6 2H10C10.5523 2 11 1.55228 11 1C11 0.447715 10.5523 0 10 0H6ZM0 6C0 5.44772 0.447715 5 1 5C1.55228 5 2 5.44772 2 6V10C2 10.5523 1.55228 11 1 11C0.447715 11 0 10.5523 0 10V6ZM14 6C14 5.44772 14.4477 5 15 5C15.5523 5 16 5.44772 16 6V10C16 10.5523 15.5523 11 15 11C14.4477 11 14 10.5523 14 10V6ZM6 14C5.44772 14 5 14.4477 5 15C5 15.5523 5.44772 16 6 16H10C10.5523 16 11 15.5523 11 15C11 14.4477 10.5523 14 10 14H6Z" fill-rule="evenodd"></path>
+                                            </svg>
+                                        </span>
+                                        <span class="text-menu">Phòng bàn</span>
+                                    </span>
+                                </button>
+                            </li>
 
-<div class="header-search" [class.has-text]="searchQuery">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <input type="text" 
-           placeholder="Tìm món..." 
-           [(ngModel)]="searchQuery"
-           (ngModelChange)="onSearchChange()"
-           (focus)="onSearchFocus()"
-           (blur)="onSearchBlur()">
-    <button class="clear-menu-search" 
-            *ngIf="searchQuery" 
-            (click)="clearSearch()"
-            title="Xóa tìm kiếm">
-        <i class="fa-solid fa-xmark"></i>
-    </button>
-    
-    <!-- ✅ DROPDOWN GỢI Ý -->
-    <div class="search-dropdown" *ngIf="showSearchDropdown && searchResults.length > 0">
-        <div class="search-result-item" 
-             *ngFor="let product of searchResults"
-             (mousedown)="selectSearchResult(product)">
-            <div class="result-info">
-                <div class="result-name">{{product.name}}</div>
-                <div class="result-category">{{product.category}}</div>
+                            <!-- Tab Thực đơn -->
+                            <li [class.active]="activeTab === 'menu'">
+                                <button class="nav-tab" (click)="changeTab('menu')">
+                                    <span class="menu-content">
+                                        <span class="btn-icon btn-icon-min">
+                                            <svg fill="none" height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M1.82115 4.5L2.57069 12.3438C2.57069 12.5625 2.72685 12.7812 2.91424 12.9062C3.03916 12.9688 3.16408 13 3.32024 13H4.00732C4.00732 13.125 4.00732 13.2188 4.00732 13.3125C4.00732 13.7188 4.06978 14.125 4.1947 14.5H3.32024C2.13346 14.5 1.1653 13.625 1.07161 12.4688L0.00975753 1.375C-0.0839353 0.65625 0.509453 0 1.259 0H9.62889C10.3784 0 10.9406 0.65625 10.8781 1.375L10.5346 5H10.5034C9.97243 5 9.50396 5.0625 9.00427 5.125L9.06673 4.5H1.82115ZM1.665 3H9.22289L9.37904 1.5H1.50884L1.665 3ZM5.00671 13.3125C5.00671 13.2188 5.00671 13.125 5.00671 13.0312C5.00671 13.0312 5.00671 13.0312 5.00671 13C5.00671 13 5.03794 12.9688 5.03794 12.9375C5.06917 12.7812 5.13163 12.625 5.19409 12.4688C5.06917 12.25 5.00671 12.0312 5.00671 11.75C5.00671 11.4062 5.13163 11.0938 5.38148 10.8438C5.25656 10.6875 5.16286 10.4688 5.1004 10.2812C5.03794 10.0312 5.00671 9.78125 5.00671 9.5C5.00671 7.9375 6.66195 6.59375 8.91058 6.15625C9.41027 6.0625 9.90997 6.03125 10.4409 6C10.4409 6 10.4721 6 10.5034 6C13.5328 6 16 7.59375 16 9.5C16 10 15.8438 10.4688 15.594 10.8438C15.8438 11.0938 16 11.4062 16 11.75C16 12.0312 15.9063 12.25 15.7814 12.4688C15.9063 12.7188 16 13 16 13.3125C16 14.8125 14.782 16 13.2829 16H7.69257C6.63072 16 5.72502 15.4062 5.28779 14.5C5.1004 14.1562 5.00671 13.75 5.00671 13.3125ZM7.63011 14.5C7.66134 14.5 7.66134 14.5 7.69257 14.5H13.2829C13.9388 14.5 14.5009 13.9688 14.5009 13.3125C14.5009 13.1562 14.3448 13 14.1886 13H6.78687C6.63072 13 6.50579 13.1562 6.50579 13.3125C6.50579 13.625 6.59949 13.9062 6.8181 14.125C7.03672 14.3438 7.3178 14.5 7.63011 14.5ZM13.5015 10.5C13.6264 10.5 13.7514 10.5 13.8763 10.4375C13.9388 10.4062 14.0325 10.375 14.0949 10.3125C14.4072 10 14.5009 9.71875 14.5009 9.5C14.5009 9.25 14.3135 8.78125 13.564 8.3125L13.5015 8.25C13.5015 8.53125 13.2517 8.75 13.0018 8.75C12.8769 8.75 12.7832 8.71875 12.6895 8.65625C12.5646 8.5625 12.5021 8.4375 12.5021 8.25C12.5021 8.09375 12.5646 7.96875 12.6895 7.875C12.5334 7.8125 12.3772 7.78125 12.1898 7.71875C11.8151 7.625 11.3778 7.5625 10.9406 7.53125C10.9718 7.59375 11.003 7.6875 11.003 7.75C11.003 8.03125 10.7532 8.25 10.5034 8.25C10.4097 8.25 10.316 8.25 10.2223 8.1875C10.191 8.1875 10.1598 8.15625 10.1286 8.125C10.1286 8.125 10.0974 8.09375 10.0974 8.0625C10.0974 8.0625 10.0974 8.0625 10.0661 8.0625V8.03125L10.0349 8C10.0037 7.9375 9.97243 7.84375 9.97243 7.78125V7.75C9.97243 7.71875 10.0037 7.6875 10.0037 7.65625C10.0037 7.625 10.0037 7.59375 10.0349 7.59375C10.0349 7.5625 10.0349 7.5625 10.0349 7.5625V7.53125C10.0037 7.53125 9.97243 7.53125 9.97243 7.53125C9.9412 7.53125 9.9412 7.53125 9.90997 7.53125C9.87874 7.53125 9.8475 7.5625 9.81627 7.5625C9.25412 7.59375 8.75442 7.71875 8.28596 7.875C8.41088 7.96875 8.47334 8.125 8.47334 8.28125C8.47334 8.40625 8.41088 8.5625 8.31719 8.65625C8.2235 8.71875 8.1298 8.78125 7.97365 8.78125C7.7238 8.78125 7.47395 8.53125 7.47395 8.28125V8.25L7.41149 8.3125C6.66195 8.78125 6.47456 9.25 6.47456 9.53125C6.47456 9.71875 6.56826 10 6.88057 10.3125C7.06795 10.4375 7.25534 10.5312 7.47395 10.5312H13.4703L13.5015 10.5Z"></path>
+                                            </svg>
+                                        </span>
+                                        <span class="text-menu">Thực đơn</span>
+                                    </span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Search bar trong header -->
+                <div class="header-search" [class.has-text]="searchQuery">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" 
+                           placeholder="Tìm món..." 
+                           [(ngModel)]="searchQuery"
+                           (ngModelChange)="onSearchChange()"
+                           (focus)="onSearchFocus()"
+                           (blur)="onSearchBlur()">
+                    <button class="clear-menu-search" 
+                            *ngIf="searchQuery" 
+                            (click)="clearSearch()"
+                            title="Xóa tìm kiếm">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    
+                    <!-- Dropdown gợi ý -->
+                    <div class="search-dropdown" *ngIf="showSearchDropdown && searchResults.length > 0">
+                        <div class="search-result-item" 
+                             *ngFor="let product of searchResults"
+                             (mousedown)="selectSearchResult(product)">
+                             <div class="result-info">
+                             <div class="result-name">{{product.name}}</div>
+                                <div class="result-meta">
+        <span class="result-code" *ngIf="product.code">{{product.group}}{{product.code}}</span>
+        <span class="result-separator" *ngIf="product.category"> | </span>
+        <span class="result-category" *ngIf="product.category">{{product.category}}</span>
+        <span class="result-separator" *ngIf="product.unitType"> | </span>
+        <span class="result-unit" *ngIf="product.unitType">{{product.unitType}}</span>
+    </div>
+</div>
+                            <div class="result-price">{{product.price | number:'1.0-0'}} </div>
+                        </div>
+                        
+                        <div class="search-footer" *ngIf="filteredMenuCount > 5">
+                            <button (mousedown)="viewAllResults()">
+                                <i class="fa-solid fa-grid"></i>
+                                Xem tất cả {{filteredMenuCount}} kết quả
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="search-dropdown no-results" 
+                         *ngIf="showSearchDropdown && searchQuery && searchResults.length === 0">
+                        <div class="no-results-message">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <p>Không tìm thấy món phù hợp</p>
+                            <small>Thử tìm với từ khóa khác</small>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="result-price">{{product.price | number:'1.0-0'}} đ</div>
-        </div>
-        
-        <!-- NÚT XEM TẤT CẢ -->
-        <div class="search-footer" *ngIf="filteredMenuCount > 5">
-            <button (mousedown)="viewAllResults()">
-                <i class="fa-solid fa-grid"></i>
-                Xem tất cả {{filteredMenuCount}} kết quả
-            </button>
-        </div>
-    </div>
-    
-    <!-- ✅ THÔNG BÁO KHÔNG TÌM THẤY -->
-    <div class="search-dropdown no-results" 
-         *ngIf="showSearchDropdown && searchQuery && searchResults.length === 0">
-        <div class="no-results-message">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <p>Không tìm thấy món phù hợp</p>
-            <small>Thử tìm với từ khóa khác</small>
-        </div>
-    </div>
-</div>
-    
-</div>
-
+             <div class="panel-content">
             <!-- Filter Toolbar -->
-<!-- Filter Toolbar -->
-<div class="filter-toolbar">
-    <!-- ✅ THANH TÌM KIẾM NÂNG CAO -->
-    <div class="advanced-search-container" *ngIf="showSearchBar">
-        <button class="back-search-btn" (click)="toggleSearchBar()" title="Đóng tìm kiếm">
-            <i class="fa-solid fa-arrow-left"></i>
-        </button>
-        <div class="advanced-search-wrapper">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input 
-                type="text" 
-                class="advanced-search-input"
-                placeholder="Tìm theo tên bàn, tên khách hàng, món trong đơn..."
-                [(ngModel)]="advancedSearchQuery"
-                (ngModelChange)="performAdvancedSearch()"
-            />
-            <button 
-                class="clear-search-btn" 
-                *ngIf="advancedSearchQuery"
-                (click)="advancedSearchQuery = ''; performAdvancedSearch()"
-                title="Xóa tìm kiếm">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        
-        <!-- ✅ HIỂN THỊ KẾT QUẢ TÌM KIẾM -->
-        <div class="search-result-count" *ngIf="advancedSearchQuery">
-            {{tables.length}} kết quả
-        </div>
-    </div>
-    
-    <!-- ✅ FILTER BUTTONS (Hiện khi KHÔNG search) -->
-    <ng-container *ngIf="!showSearchBar">
-        <button class="filter-btn" 
-                *ngFor="let filter of currentFilters"
+            <div class="filter-toolbar">
+                <div class="advanced-search-container" *ngIf="showSearchBar">
+                    <button class="back-search-btn" (click)="toggleSearchBar()" title="Đóng tìm kiếm">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div class="advanced-search-wrapper">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input 
+                            type="text" 
+                            class="advanced-search-input"
+                            placeholder="Tìm theo tên bàn, tên khách hàng, món trong đơn..."
+                            [(ngModel)]="advancedSearchQuery"
+                            (ngModelChange)="performAdvancedSearch()"
+                        />
+                        <button 
+                            class="clear-search-btn" 
+                            *ngIf="advancedSearchQuery"
+                            (click)="advancedSearchQuery = ''; performAdvancedSearch()"
+                            title="Xóa tìm kiếm">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="search-result-count" *ngIf="advancedSearchQuery">
+                        {{tables.length}} kết quả
+                    </div>
+                </div>
+                
+<ng-container *ngIf="!showSearchBar">
+    <div class="filter-btn-row" #filterRow>
+        <button class="filter-btn"
+                *ngFor="let filter of visibleFilters"
                 [class.inactive]="selectedFilter !== filter"
                 (click)="selectFilter(filter)">
             {{filter}}
         </button>
-        
-        <div class="toolbar-icons">
-            <i class="fa-solid fa-magnifying-glass" 
-               (click)="toggleSearchBar()" 
-               title="Tìm kiếm nâng cao"></i>
-        </div>
-    </ng-container>
-</div>
+    </div>
+
+    <div class="filter-dropdown-wrapper" *ngIf="hiddenFilters.length > 0">
+        <button class="filter-btn filter-more-btn"
+                [class.inactive]="!isHiddenFilterSelected"
+                (click)="toggleFilterDropdown($event)">
+            {{ isHiddenFilterSelected ? selectedFilter : '' }}
+            <i class="fa-solid fa-chevron-down" [class.rotated]="showFilterDropdown"></i>
+        </button>
+    </div>
+
+    <div class="toolbar-icons">
+        <i class="fa-solid fa-magnifying-glass"
+           (click)="toggleSearchBar()"
+           title="Tìm kiếm nâng cao"></i>
+    </div>
+</ng-container>
+            </div>
 
             <!-- Status Row -->
-<div class="status-row" *ngIf="activeTab === 'rooms'">
-    <div class="status-item" 
-         *ngFor="let status of statusList"
-         [class.active]="selectedStatus === status.key"
-         (click)="selectStatus(status.key)">
-        <i [class]="status.icon"></i>
-        {{status.label}}
-    </div>
-</div>
+            <div class="status-row" *ngIf="activeTab === 'rooms'">
+                <div class="status-item" 
+                     *ngFor="let status of statusList"
+                     [class.active]="selectedStatus === status.key"
+                     (click)="selectStatus(status.key)">
+                    <i [class]="status.icon"></i>
+                    {{status.label}}
+                </div>
+            </div>
 
             <!-- Content Area - Tables or Menu -->
             <div class="table-area" *ngIf="activeTab === 'rooms'">
                 <div class="table-grid">
-                    <!-- Tables -->
-                     <div class="table-card" 
-     *ngFor="let table of tables"
-     [class.active]="selectedTable?.id === table.id"
-     [class.serving]="table.status === 'serving'"
-     [class.reserved]="table.status === 'reserved'"
-     (click)="selectTable(table)">
-     
-    <div class="table-icon">
-        <!-- ✅ Hiển thị thông tin khi đang phục vụ -->
-        <div class="table-info-overlay" *ngIf="table.status === 'serving' && table.totalAmount">
-            <div class="table-amount">
-                {{table.totalAmount | number:'1.0-0':'en-US'}}
-            </div>
-        </div>
-    </div>
-    
-    <b style="font-size:14px;" 
-       [style.color]="selectedTable?.id === table.id ? 'white' : '#64748b'">
-        {{table.name}}
-    </b>
-</div>
+                    <div class="table-card" 
+                         *ngFor="let table of tables"
+                         [class.active]="selectedTable?.id === table.id"
+                         [class.serving]="table.status === 'serving'"
+                         [class.reserved]="table.status === 'reserved'"
+                         (click)="selectTable(table)">
+                        
+                        <div class="table-icon">
+                            <div class="table-info-overlay" *ngIf="table.status === 'serving' && table.totalAmount">
+                                <div class="table-amount">
+                                    {{table.totalAmount | number:'1.0-0':'en-US'}}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <b style="font-size:14px;" 
+                           [style.color]="selectedTable?.id === table.id ? 'white' : '#64748b'">
+                            {{table.name}}
+                        </b>
+                    </div>
                 </div>
             </div>
 
@@ -164,82 +199,62 @@
                     <div class="menu-item" 
                          *ngFor="let product of filteredMenu"
                          (click)="addItem(product)">
-                        <div class="menu-item-image">
-                           
-                        </div>
-                        <div class="menu-item-info">
-                            <div class="menu-item-name">{{product.name}}</div>
-                            <div class="menu-item-price">{{product.price | number:'1.0-0'}} đ</div>
-                        </div>
+                        <div class="menu-item-image"></div>
+                         <div class="menu-item-info">
+    <div class="menu-item-name">{{product.name}}</div>
+    <div class="menu-item-price">{{product.price | number:'1.0-0'}} </div>
+    <div class="menu-item-unit" *ngIf="product.unitType">{{product.unitType}}</div>
+</div>
                     </div>
                 </div>
             </div>
-
-            <!-- Panel Footer -->
-            <div class="panel-footer">
-                <input type="checkbox" 
-                       id="auto-menu" 
-                       [(ngModel)]="autoOpenMenu">
-                <label for="auto-menu">Mở thực đơn khi chọn bàn</label>
             </div>
         </div>
     </div>
 
-    <!-- Right Panel - Order Details -->
-    <div class="panel-wrapper">
-        <div class="panel">
-            <!-- Panel Header -->
-            <div class="panel-header">
-                <div class="tab-badge" (click)="cancelInvoice()" style="cursor: pointer;" title="Hủy đơn hàng">
-                   {{orderCode}}<i class="fa-solid fa-xmark"></i>
-                </div>
-               
-                <div class="header-icons">
-                      <button class="back-btn" (click)="goBack()" title="Quay lại">
-                   <i class="pi pi-home"></i>
-                      </button>
-                </div>
+<!-- Right Panel - Order Details -->
+<div class="panel-wrapper">
+    <div class="panel">
+        <!-- ===== PANEL HEADER KIỂU KIOTVIET - BÊN HÓA ĐƠN ===== -->
+<div class="panel-header">
+    <div class="header-left">
+        <div class="header-icons">
+            <!-- Giờ hiển thị thông tin bàn ở đây -->
+            <div class="tab-badge" *ngIf="selectedTable">
+                <i class="fa-solid fa-table-cells"></i>
+                {{selectedTable.name}} / {{selectedTable.area}}
             </div>
-
-<div class="order-toolbar">
-    <!-- ✅ CHỈ HIỂN THỊ THÔNG TIN BÀN -->
-    <div class="table-info" *ngIf="selectedTable">
-        <i class="fa-solid fa-table-cells"></i>
-        {{selectedTable.name}} / {{selectedTable.area}}
+            <div class="tab-badge tab-badge-warning" *ngIf="!selectedTable">
+                <i class="pi pi-exclamation-circle" style="font-size: 16px;"></i>Vui lòng chọn bàn
+            </div>
+        </div>
     </div>
-    
-    <!-- ✅ HIỂN THỊ THÔNG BÁO NẾU CHƯA CHỌN BÀN -->
-    <div class="table-info table-info-warning" *ngIf="!selectedTable">
-        <i class="fa-solid fa-exclamation-triangle"></i>
-        Vui lòng chọn bàn
-    </div>
-    
-    <div class="search-customer">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" 
-               placeholder="Tìm khách hàng " 
-               [(ngModel)]="customerSearch">
-    </div>
-    <!-- ✅ Dùng button wrapper -->
-    <button type="button" class="btn-add-customer" (click)="openCustomerModal()">
-        <i class="fa-regular fa-plus"></i>
-    </button>
 </div>
 
-            <!-- Customer Info Display -->
-            <div class="customer-info-bar" *ngIf="customer.name || customer.phone">
-                <div class="customer-details">
-                    <span *ngIf="customer.name">
-                        <i class="fa-solid fa-user"></i> {{customer.name}}
-                    </span>
-                    <span *ngIf="customer.phone">
-                        <i class="fa-solid fa-phone"></i> {{customer.phone}}
-                    </span>
-                </div>
-                <button class="edit-customer-btn" (click)="openCustomerModal()">
-                    <i class="fa-solid fa-edit"></i>
+<div class="panel-content">
+    <div class="order-toolbar">
+        <!-- Giờ hiển thị mã đơn + nút hủy ở đây -->
+        <div class="table-info table-info-cancel" (click)="cancelInvoice()" title="Hủy đơn hàng" style="cursor:pointer">
+            {{selectedTable?.orderCode || 'Mới'}}
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+                
+    <div class="search-customer" #customerSearchContainer>
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" 
+           placeholder="Tìm khách hàng" 
+           [(ngModel)]="customerSearch"
+           (ngModelChange)="onCustomerSearchChange($event)"
+           (focus)="onCustomerSearchFocus()"
+           (blur)="onCustomerSearchBlur()">
+</div>
+                
+                <button type="button" class="btn-add-customer" (click)="openCustomerModal()">
+                    <i class="fa-regular fa-plus"></i>
                 </button>
             </div>
+
+            
 
             <!-- Empty Order State -->
             <div class="empty-order" *ngIf="orderItems.length === 0">
@@ -248,58 +263,38 @@
                 <p>Vui lòng chọn bàn và món trong thực đơn</p>
             </div>
 
-         
-<!-- Order Items List -->
-<cdk-virtual-scroll-viewport 
-    *ngIf="orderItems.length > 0"
-    class="order-list-viewport"
-    itemSize="76">
-    
-    <div class="order-item" *cdkVirtualFor="let item of orderItems">
-        <div class="item-info">
-            <span class="item-name">{{item.productName}}</span>
-            <span class="item-price">{{item.unitPrice | number:'1.0-0'}} đ</span>
-        </div>
-        <div class="item-controls">
-            <button (click)="updateQuantity(item.id, item.quantity - 1)">-</button>
-            <span>{{item.quantity}}</span>
-            <button (click)="updateQuantity(item.id, item.quantity + 1)">+</button>
-            <button (click)="removeMenuItem(item.id)" class="remove-btn">
-                <i class="fa-solid fa-trash"></i>
-            </button>
-        </div>
-        <div class="item-total">
-            {{item.unitPrice * item.quantity | number:'1.0-0'}} đ
-        </div>
-    </div>
-</cdk-virtual-scroll-viewport>
+            <!-- Order Items List -->
+            <cdk-virtual-scroll-viewport 
+                *ngIf="orderItems.length > 0"
+                class="order-list-viewport"
+                itemSize="76">
+                
+                <div class="order-item" *cdkVirtualFor="let item of orderItems">
+                    <div class="item-info">
+                        <span class="item-name">{{item.productName}}</span>
+                             <span class="item-unit" *ngIf="getProductUnit(item.productId)">
+                            {{ getProductUnit(item.productId) }}
+                             </span>
+                    </div>
+                    <div class="item-controls">
+                        <button (click)="updateQuantity(item.id, item.quantity - 1)">-</button>
+                        <input type="number" 
+       [value]="item.quantity"
+       (change)="updateQuantity(item.id, +$any($event.target).value)"
+       min="1"
+       style="width:33px;height:24px;text-align:center;border:1px solid #e2e8f0;border-radius:6px;font-weight:500;font-size:14px;color:#333;padding:2px 0;outline:none;background:white;">
+                        <button (click)="updateQuantity(item.id, item.quantity + 1)">+</button>
+                        <button (click)="removeMenuItem(item.id)" class="remove-btn">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="item-total">
+                        {{item.unitPrice * item.quantity | number:'1.0-0'}} 
+                    </div>
+                </div>
+            </cdk-virtual-scroll-viewport>
 
-            <!-- Order Summary -->
-             <!-- Order Summary -->
-<div class="order-summary" *ngIf="orderItems.length > 0">
-    <div class="summary-row">
-        <span>Tạm tính</span>
-        <span>{{subTotal | number:'1.0-0'}} đ</span>
-    </div>
-    
-    <!-- ✅ THÊM DROPDOWN CHỌN VAT -->
-    <div class="summary-row vat-row">
-        <span>VAT</span>
-        <div class="vat-selector">
-            <select [(ngModel)]="vatRate" class="vat-dropdown">
-                <option *ngFor="let option of vatOptions" [value]="option.value">
-                    {{option.label}}
-                </option>
-            </select>
-            <span class="vat-amount">{{vat | number:'1.0-0'}} đ</span>
-        </div>
-    </div>
-    
-    <div class="summary-row" *ngIf="discount > 0">
-        <span>Giảm giá</span>
-        <span>-{{discount | number:'1.0-0'}} đ</span>
-    </div>
-</div>
+        
 
             <!-- Action Footer -->
             <div class="action-footer">
@@ -308,28 +303,36 @@
                         Tổng tiền
                         <span class="item-count">({{itemCount}} món)</span>
                     </div>
-                    <div class="total-amount">{{totalAmount | number:'1.0-0'}} đ</div>
+                    <div class="total-amount">{{totalAmount | number:'1.0-0'}} </div>
                 </div>
                 <div class="action-buttons">
                     <button class="btn-action btn-notify" 
-                            
                             [disabled]="orderItems.length === 0">
                         <i class="fa-solid fa-bell"></i>
-                        Thông báo 
+                        Thông báo
                     </button>
                     <button class="btn-action btn-payment" 
                             (click)="payment()"
                             [disabled]="orderItems.length === 0">
                         <i class="fa-solid fa-dollar-sign"></i>
-                        THANH TOÁN 
+                        THANH TOÁN
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- ✅ THAY ĐỔI: Thêm [visible] binding -->
+</div>
+<ng-template #dropdownTemplate>
+    <div class="filter-dropdown-menu-overlay">
+        <button class="filter-dropdown-item"
+                *ngFor="let filter of hiddenFilters"
+                [class.active]="selectedFilter === filter"
+                (click)="selectFilter(filter)">
+            {{filter}}
+        </button>
+    </div>
+</ng-template>
 <app-customer-modal 
     *ngIf="showCustomerModal"
     [visible]="showCustomerModal"

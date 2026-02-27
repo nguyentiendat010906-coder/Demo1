@@ -60,6 +60,7 @@
             <input [(ngModel)]="customer.name" 
                    name="name"
                    #name="ngModel"
+                   autocomplete="off"
                    required>
             <div class="error-message" *ngIf="name.invalid && (name.dirty || name.touched || submitted)">
               <small *ngIf="name.errors?.['required']"><i class="pi pi-info-circle"></i> Vui lòng nhập họ và tên</small>
@@ -69,6 +70,7 @@
           <div class="form-field">
             <label>Số điện thoại</label>
             <input [(ngModel)]="customer.phone" 
+                   autocomplete="off"
                    name="phone"
                    (blur)="validatePhone()"
                    (input)="phoneError = ''"
@@ -83,7 +85,10 @@
         <div class="form-row">
           <div class="form-field">
             <label>Mã số thuế</label>
-            <input [(ngModel)]="customer.taxCode" name="taxCode">
+            <input [(ngModel)]="customer.taxCode" name="taxCode" autocomplete="off" (blur)="validateTaxCode()" (input)="taxCodeError = ''">
+                <div class="error-message" *ngIf="taxCodeError">
+              <small><i class="pi pi-info-circle"></i> {{ taxCodeError }}</small>
+            </div>
           </div>
 
           <div class="form-field">
@@ -93,6 +98,7 @@
                    (blur)="validateCCCD()"
                    (input)="cccdError = ''"
                    maxlength="12"
+                   autocomplete="off"
                   >
             <!-- ← THÊM hiển thị lỗi CCCD -->
             <div class="error-message" *ngIf="cccdError">
@@ -103,7 +109,17 @@
 
         <div class="form-field full-width">
           <label>Email</label>
-          <input [(ngModel)]="customer.email" name="email">
+          <input 
+           type="email" 
+           [(ngModel)]="customer.email" 
+           name="email"
+          (blur)="validateEmail()"
+           autocomplete="off"
+           class="form-control">
+                                 
+            <div class="error-message" *ngIf="emailError">
+              <small><i class="pi pi-info-circle"></i> {{ emailError }}</small>
+            </div>
         </div>
 
         <div class="form-field full-width">
@@ -115,11 +131,18 @@
     </div>
 
     <div class="modal-footer">
-      <button class="modal-btn cancel" (click)="closeModal()">Hủy</button>
-      <button class="modal-btn save" (click)="saveModal()">
-        <i class="pi pi-check" style="vertical-align:-2px"></i>
+            <button class="modal-btn save" (click)="saveModal()">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M13 4L6 11L3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
          Lưu
       </button>
+      <button class="modal-btn cancel" (click)="closeModal()">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Đóng</button>
+
     </div>
 
   </div>

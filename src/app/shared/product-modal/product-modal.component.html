@@ -172,17 +172,6 @@
                   </div>
                 </div>
               </div>
-
-              <div class="form-field">
-                <label>Tồn kho ban đầu</label>
-                <input 
-                  type="number" 
-                  [(ngModel)]="formData.initialStock" 
-                  name="initialStock"
-                  class="form-input text-right"
-                  value="0"
-                />
-              </div>
             </div>
 
             <!-- Checkboxes -->
@@ -195,14 +184,7 @@
                 />
                 <span>Dịch vụ</span>
               </label>
-              <label class="checkbox-label">
-                <input 
-                  type="checkbox" 
-                  [(ngModel)]="formData.hasConversion"
-                  name="hasConversion"
-                />
-                <span>Quy đổi</span>
-              </label>
+            
             </div>
 
             <!-- Ghi chú -->
@@ -260,18 +242,19 @@
 
     <!-- Footer -->
     <div class="modal-footer">
+            <button type="button" class="btn-primary" (click)="onSubmit()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M13 4L6 11L3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Lưu
+      </button>
       <button type="button" class="btn-secondary" (click)="closeModal()">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
         Đóng
       </button>
-      <button type="button" class="btn-primary" (click)="onSubmit()">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M13 4L6 11L3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        {{ editingProduct ? 'Cập nhật' : 'Lưu' }}
-      </button>
+
     </div>
   </div>
 </div>

@@ -14,7 +14,7 @@
   gap: 10px;
   padding: 10px;
   flex: 1;
-  background: #f3eaea;
+  background:#003264;
   overflow: hidden;
 }
 
@@ -28,7 +28,7 @@
 
 /* ===== ĐIỀU CHỈNH TỶ LỆ PANEL ===== */
 .panel-wrapper:first-child {
-  flex: 1.4;
+  flex: 1.5;
 }
 
 .panel-wrapper:last-child {
@@ -37,65 +37,234 @@
 
 .panel {
   flex: 1;
-  background: white;
+  background: transparent;      /* ← ĐỔI THÀNH TRANSPARENT */
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;            /* ← ĐỔI THÀNH VISIBLE */
   height: 100%;
-   box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .panel > * {
   box-sizing: border-box;
 }
-/* ===== PANEL HEADER ===== */
+
+/* ===== PANEL HEADER - KIỂU KIOTVIET ===== */
 .panel-header {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  border-bottom: 1px solid #e2e8f0;
+  align-items: stretch;
+  min-height: 48px;
+  padding: 0;
+  border-bottom: none;
   flex-shrink: 0;
-  background: #008cff;
+  background: #003264;
+  position: relative;
 }
 
-.nav-tab {
+/* ===== HEADER LEFT - CHỨA NÚT QUAY LẠI VÀ TABS ===== */
+.header-left {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  flex: 1;
+}
+
+/* ===== NÚT QUAY LẠI KIỂU KIOTVIET ===== */
+.header-icons {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 37px;
+  background: linear-gradient(90deg, #056BE2 0%, #0F97F2 100%);
+  color: white;
   border: none;
-  background: rgba(255, 255, 255, 0.15);
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
-  color: white;
   transition: all 0.2s;
+  padding: 0;
+  transform: translateY(-4px);
+}
+
+
+.back-btn i {
+  font-size: 16px;
+}
+
+/* ===== KV TABS - KIỂU KIOTVIET ===== */
+.kv-tabs {
+  display: flex;
+  background: #003264;
+}
+
+.kv-tabs ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0px;
+}
+
+
+.kv-tabs li {
+  position: relative;
+  height: 48px;
+  background: #003264;
+  z-index: 1;
+}
+
+.kv-tabs li.active {
+  z-index: 3;
+  background: transparent;
+  overflow: visible;
+}
+
+/* ===== NAV TAB - KIỂU KIOTVIET (SIÊU MƯỢT) ===== */
+.nav-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 36px;
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0s ease-in-out, 
+              color 0s ease-in-out;
+  z-index: 2;
+  background: linear-gradient(90deg, #056BE2 0%, #0F97F2 100%);
+  border-radius: 27px 27px 0 0;
   font-weight: 500;
+  border: none;
+  gap: 8px;
+  overflow: visible;
 }
 
-.nav-tab:hover {
-  background: rgba(255, 255, 255, 0.15);
+/* ===== GÓC BO NGƯỢC - CHỈ DÙNG OPACITY (SIÊU MƯỢT) ===== */
+.nav-tab::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle at top left, transparent 19px, #ffffff 20px);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0s ease-in-out;
 }
 
-.nav-tab.active {
+.nav-tab::after {
+  content: '';
+  position: absolute;
+  right: -20px;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle at top right, transparent 19px, #ffffff 20px);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0s ease-in-out;
+}
+
+/* ===== HIỆN GÓC BO KHI TAB ACTIVE ===== */
+.kv-tabs li.active .nav-tab::before,
+.kv-tabs li.active .nav-tab::after {
+  opacity: 1;
+}
+
+/* ===== ACTIVE TAB - KIỂU KIOTVIET ===== */
+.kv-tabs li.active .nav-tab {
+  color: #0066CC;
   background: #ffffff;
-  color: #008cff;
 }
 
+.kv-tabs li.active .nav-tab:hover {
+  background: #ffffff;
+}
+
+/* ===== MENU CONTENT ===== */
+.menu-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 3;
+}
+
+.btn-icon-min {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.btn-icon-min svg {
+  width: 20px;
+  height: 20px;
+}
+
+.nav-tab svg path {
+  fill: currentColor;
+  transition: fill 0s ease-in-out;
+}
+
+.nav-tab svg {
+  color: inherit;
+  transition: color 0s ease-in-out;
+}
+
+/* Đảm bảo màu fill thay đổi theo trạng thái active */
+.kv-tabs li.active .nav-tab svg path {
+  fill: currentColor;
+}
+
+.text-menu {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* ===== HEADER SEARCH - KIỂU KIOTVIET ===== */
 .header-search {
+  position: relative;
   flex: 1;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #0066CC;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 25px;
   max-width: 600px;
+  margin: 5px 16px;
+  right: 9%;
+  top: -3px;
 }
+.header-search:focus-within {
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.25);
+}
+.header-search:focus-within input {
+  color: #003264;
+}
+
+.header-search:focus-within input::placeholder {
+  color: rgb(0, 0, 0);
+}
+
+.header-search:focus-within i {
+  color: #0066CC;
+}
+
 
 .header-search i {
   color: rgba(255, 255, 255, 0.9);
@@ -107,11 +276,12 @@
   background: none;
   outline: none;
   font-size: 14px;
-  color: white;
+  color: rgb(255, 255, 255);
+
 }
 
 .header-search input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: #fff;
 }
 
 .clear-menu-search {
@@ -125,36 +295,39 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-.header-icons {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 15px;
+.clear-menu-search:hover {
   color: white;
 }
 
-.header-icons i {
-  cursor: pointer;
-  font-size: 18px;
-  padding: 5px;
-  transition: all 0.2s;
-}
-
-.header-icons i:hover {
-  opacity: 0.8;
-}
-
+/* ===== TAB BADGE - KIỂU CHROME ===== */
 .tab-badge {
-  background: white;
-  color: #005695;
-  padding: 9px 18px;
-  border-radius: 8px;
+  position: relative;
+  background: #fff;
+  color: #0066CC;
+  /* Padding bên phải ít hơn một chút vì phần đuôi sẽ loe ra thêm */
+  padding: 9px 12px 9px 8px; 
+  height: 38px;
+  /* Chỉ bo góc trên, góc dưới để vuông để nối với phần loe */
+  border-radius: 10px 32px 0 0; 
   display: flex;
   align-items: center;
   gap: 12px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  z-index: 5;
+  align-self: flex-end;
+  margin-bottom: 0;
+  margin-left: 0;
+  transition: all 0.2s ease;
+  
+  /* QUAN TRỌNG: Phải là visible để phần đuôi lòi ra ngoài được */
+  overflow: visible; 
+  
+  /* Bỏ box-shadow cũ đi để tránh bị gãy khúc với phần đuôi */
+  box-shadow: none; 
+  /* Dùng filter này để đổ bóng cho cả tab và phần đuôi cùng lúc */
+  filter: drop-shadow(0 -1px 2px rgba(0,0,0,0.1)); 
 }
 
 .tab-badge i {
@@ -162,33 +335,34 @@
   font-size: 16px;
 }
 
-/* ===== NÚT QUAY LẠI Ở HEADER ===== */
-.back-btn {
+/* Góc bo NGƯỢC bên PHẢI (Dùng Gradient - Cách chắc chắn nhất) */
+.tab-badge::after {
+  content: '';
+  position: absolute;
+  right: -20px;   /* Đẩy hẳn ra ngoài bên phải 20px */
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle at top right, transparent 19px, #fff 20px);
+  z-index: 1;
+}
+
+/* Bỏ padding của header-icons ở panel phải */
+.panel-wrapper:last-child .header-icons {
+  padding: 0;
+}/* Bỏ bo góc trên-trái CHỈ cho panel bên phải (panel có tab-badge) */
+.panel-wrapper:last-child .panel-content {
+  border-radius: 0 8px 8px 8px;  /* ← Bỏ bo góc trên-trái */
+}
+
+.panel-content {
+  flex: 1;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 8px;
-  background: #ef4444;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s;
-  margin-right: auto;
+  flex-direction: column;
+  background: white;
+  border-radius: 8px 8px 8px 8px;
+  overflow: hidden;
 }
-
-.back-btn:hover {
-  background: #dc2626;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);
-}
-
-.back-btn i {
-  font-size: 16px;
-}
-
 /* ===== FILTER TOOLBAR ===== */
 .filter-toolbar {
   display: flex;
@@ -197,6 +371,10 @@
   padding: 12px 15px;
   border-bottom: 1px solid #e8eef3;
   flex-shrink: 0;
+   border-radius: 8px 8px 0 0;
+    flex-wrap: nowrap;      /* ✅ THÊM */
+  overflow: visible;       /* ✅ THÊM */
+  min-width: 0; 
 }
 
 .filter-btn {
@@ -209,6 +387,22 @@
   font-size: 13px;
   font-weight: 500;
   transition: all 0.2s;
+}
+
+/* ===== FILTER BTN ROW ===== */
+.filter-btn-row {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  flex-wrap: nowrap;      /* ✅ KHÔNG XUỐNG HÀNG */
+  overflow: hidden;       /* ✅ CLIP BUTTON TRÀN */
+  min-width: 0;
+  align-items: center;
+}
+
+.filter-btn-row .filter-btn {
+  flex-shrink: 0;         /* ✅ KHÔNG BỊ CO */
+  white-space: nowrap;    /* ✅ TEXT KHÔNG XUỐNG HÀNG */
 }
 
 .filter-btn:hover {
@@ -228,6 +422,7 @@
   display: flex;
   gap: 12px;
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 .toolbar-icons i {
@@ -399,14 +594,12 @@
 
 .table-card {
   height: 115px;
-  border: 2px solid #d1d5db;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background: white;
   gap: 8px;
   transition: all 0.2s;
   position: relative;
@@ -420,7 +613,6 @@
 
 .table-card.active {
   background: #0067c4;
-  border-color: #0067c4;
   color: white;
 }
 
@@ -440,22 +632,74 @@
 }
 
 .table-icon {
-  width: 52px;
-  height: 34px;
+  width: 87px;
+  height: 53px;
   border: 2.5px solid currentColor;
-  border-radius: 7px;
+  border-radius: 18.4px;
+  border-color: #94a3b8;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-info-overlay {
+  position: absolute;
+  inset: 2px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0 3px;
+}
+
+.table-amount {
+  color: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.table-card.serving .table-info-overlay {
+  color: #10b981;
+}
+
+.table-card.serving.active .table-info-overlay {
+  color: white;
+}
+
+.table-card.reserved .table-info-overlay {
+  color: #f59e0b;
+}
+
+.table-card.reserved.active .table-info-overlay {
+  color: white;
+}
+.table-card.active .table-icon,
+.table-card.serving.active .table-icon,
+.table-card.reserved.active .table-icon {
+  border-color: white !important;
+}
+
+.table-card.active .table-icon::before,
+.table-card.serving.active .table-icon::before,
+.table-card.reserved.active .table-icon::before {
+  border-color: white !important;
 }
 
 /* ===== MENU GRID ===== */
 .menu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
 }
 
 .menu-item {
   background: white;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.2s;
@@ -485,14 +729,14 @@
 }
 
 .menu-item-info {
-  padding: 12px;
+  padding: 6px 8px;
 }
 
 .menu-item-name {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 11px;
   color: #1e293b;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -501,25 +745,7 @@
 .menu-item-price {
   color: #0067c4;
   font-weight: 600;
-  font-size: 13px;
-}
-
-/* ===== PANEL FOOTER ===== */
-.panel-footer {
-  padding: 12px 15px;
-  border-top: 1px solid #e8eef3;
-  flex-shrink: 0;
-  font-size: 13px;
-}
-
-.panel-footer input[type="checkbox"] {
-  cursor: pointer;
-  margin-right: 8px;
-}
-
-.panel-footer label {
-  cursor: pointer;
-  user-select: none;
+  font-size: 10px;
 }
 
 /* ===== ORDER TOOLBAR ===== */
@@ -545,12 +771,16 @@
   flex-shrink: 0;
 }
 
+.table-info-warning {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
 .search-customer {
   flex: 1;
   display: flex;
   align-items: center;
   gap: 8px;
-  position: relative;
 }
 
 .search-customer input {
@@ -679,7 +909,7 @@
   color: #94a3b8;
 }
 
-/* ===== ✅ ORDER LIST VỚI SCROLL ===== */
+/* ===== ORDER LIST VỚI SCROLL ===== */
 .order-list {
   flex: 1;
   overflow-y: auto;
@@ -689,7 +919,6 @@
   min-height: 0;
 }
 
-/* ✅ Custom scrollbar */
 .order-list::-webkit-scrollbar {
   width: 8px;
 }
@@ -715,16 +944,35 @@
   margin-bottom: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: grid;
-  grid-template-columns: 1fr 160px 80px; /* ✅ Fixed width cho controls và total */
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 12px;
   align-items: center;
+  height: 30px;
 }
 
+.order-item .remove-btn {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.order-item:hover .remove-btn {
+  opacity: 1;
+}
+
+.order-item input[type="number"]::-webkit-inner-spin-button,
+.order-item input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.order-item input[type="number"] {
+  -moz-appearance: textfield;
+}
 .item-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-width: 0; /* ✅ Cho phép text truncate nếu cần */
+  min-width: 0;
 }
 
 .item-name {
@@ -736,22 +984,17 @@
   white-space: nowrap;
 }
 
-.item-price {
-  color: #666;
-  font-size: 13px;
-}
-
 .item-controls {
   display: flex;
   align-items: center;
   gap: 8px;
-  justify-content: center; /* ✅ Center các controls */
+  justify-content: center;
 }
 
 .item-controls button {
   width: 30px;
   height: 30px;
-  flex-shrink: 0; /* ✅ Giữ kích thước cố định */
+  flex-shrink: 0;
   border: 1px solid #e2e8f0;
   background: white;
   border-radius: 6px;
@@ -771,11 +1014,11 @@
 
 .item-controls span {
   min-width: 30px;
-  width: 30px; /* ✅ Fixed width */
+  width: 30px;
   text-align: center;
   font-weight: 600;
   color: #333;
-  flex-shrink: 0; /* ✅ Giữ kích thước cố định */
+  flex-shrink: 0;
 }
 
 .remove-btn {
@@ -792,40 +1035,18 @@
   color: #0067c4;
   text-align: right;
   font-size: 14px;
-  white-space: nowrap; /* ✅ Không cho xuống hàng */
+  white-space: nowrap;
 }
 
-/* ===== ORDER SUMMARY ===== */
-.order-summary {
-  padding: 12px 15px;
-  background: white;
-  border-top: 1px solid #e8eef3;
-  flex-shrink: 0;
-}
 
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 0;
-  font-size: 14px;
-}
 
-.summary-row span:first-child {
-  color: #666;
-}
-
-.summary-row span:last-child {
-  font-weight: 600;
-  color: #333;
-}
-
-/* ===== ACTION FOOTER - CỐ ĐỊNH Ở DƯỚI ===== */
+/* ===== ACTION FOOTER ===== */
 .action-footer {
   padding: 15px;
   border-top: 2px solid #e8eef3;
-  flex-shrink: 0; /* ✅ QUAN TRỌNG: Không cho co lại */
+  flex-shrink: 0;
   background: white;
-  position: relative; /* ✅ Đảm bảo nó nằm ở cuối */
+  position: relative;
 }
 
 .total-row {
@@ -927,51 +1148,22 @@
   background: #94a3b8;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 1024px) {
-  .main-area {
-    flex-direction: column;
-  }
-  
-  .panel-wrapper {
-    min-height: 400px;
-  }
-  
-  .table-grid {
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  }
-  
-  .menu-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  }
-}
-/* ===== CDK VIRTUAL SCROLL VIEWPORT - SCROLL RIÊNG ===== */
+/* ===== CDK VIRTUAL SCROLL VIEWPORT ===== */
 .order-list-viewport {
   flex: 1;
   background: #fafbfc;
   padding: 0 15px;
-  min-height: 0; /* ✅ Quan trọng để flex shrink hoạt động */
-  max-height: none; /* ✅ Bỏ giới hạn max-height */
+  min-height: 0;
+  max-height: none;
   overflow-y: auto;
   overflow-x: hidden;
   box-sizing: border-box;
 }
 
-/* ===== ORDER SUMMARY ===== */
-.order-summary {
-  padding: 12px 15px;
-  background: white;
-  border-top: 1px solid #e8eef3;
-  flex-shrink: 0; /* ✅ Không co lại */
-  box-sizing: border-box;
-}
-
-/* ✅ Override CDK scroll styles */
 .order-list-viewport .cdk-virtual-scroll-content-wrapper {
   padding: 15px 0;
 }
 
-/* ✅ Scrollbar cho viewport */
 .order-list-viewport::-webkit-scrollbar {
   width: 8px;
 }
@@ -990,295 +1182,307 @@
   background: #94a3b8;
 }
 
-/* ===== ORDER ITEM (giữ nguyên) ===== */
-.order-item {
-  background: white;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 12px;
-  align-items: center;
-  height: 66px; /* ✅ THÊM: Chiều cao cố định cho mỗi item */
-}
-.table-icon {
-  width: 87px;
-  height: 53px;
-  border: 2.5px solid currentColor;
-  border-radius: 7px;
-  position: relative; /* ✅ Để chứa overlay */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.table-info-overlay {
-  position: absolute;
-  inset: 2px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  font-size: 9px;
-  font-weight: 600;
-  line-height: 1;
-  padding: 0 3px;
-}
-
-
-.table-amount {
-  color: inherit;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-/* ✅ Màu chữ theo trạng thái */
-.table-card.serving .table-info-overlay {
-  color: #10b981;
-}
-
-.table-card.serving.active .table-info-overlay {
-  color: white;
-}
-
-.table-card.reserved .table-info-overlay {
-  color: #f59e0b;
-}
-
-.table-card.reserved.active .table-info-overlay {
-  color: white;
-}
-/* ===================================================================
-   ✅ PHẦN SEARCH DROPDOWN - ĐÃ XÓA TRÙNG LẶP
-   Copy đoạn này thay thế phần search dropdown cũ trong CSS
-   =================================================================== */
-
-.header-search {
-    position: relative;
-    flex: 1;
-    max-width: 800px;
-}
-
-/* ===== DROPDOWN CONTAINER ===== */
+/* ===== SEARCH DROPDOWN ===== */
 .search-dropdown {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    right: 0;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    max-height: 400px;
-    overflow-y: auto;
-    z-index: 1000;
-    animation: slideDown 0.2s ease; /* ✅ Dùng animation đã có sẵn */
-    border: 1px solid #e2e8f0;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  animation: slideDown 0.2s ease;
+  border: 1px solid #e2e8f0;
 }
 
-/* ✅ KHÔNG CẦN KHAI BÁO LẠI @keyframes slideDown - ĐÃ CÓ RỒI */
-
-/* ===== SEARCH RESULT ITEM ===== */
 .search-result-item {
-    padding: 14px 16px;
-    border-bottom: 1px solid #f1f5f9;
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
 
 .search-result-item:hover {
-    background-color: #f8fafc;
-    padding-left: 20px;
+  background-color: #f8fafc;
+  padding-left: 20px;
 }
 
 .search-result-item:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
-/* ===== RESULT INFO ===== */
 .result-info {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .result-name {
-    font-size: 14px;
-    color: #1e293b;
-    font-weight: 500;
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 14px;
+  color: #1e293b;
+  font-weight: 500;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.result-category {
-    font-size: 12px;
-    color: #64748b;
-    display: inline-block;
-    padding: 2px 8px;
-    background: #f1f5f9;
-    border-radius: 4px;
-}
 
 .result-price {
-    font-size: 14px;
-    color: #10b981;
-    font-weight: 600;
-    white-space: nowrap;
+  font-size: 14px;
+  color: #103db9;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-/* ===== SEARCH FOOTER ===== */
 .search-footer {
-    padding: 10px 16px;
-    border-top: 1px solid #e2e8f0;
-    background: linear-gradient(to bottom, #f8fafc, #ffffff);
-    border-radius: 0 0 12px 12px;
+  padding: 10px 16px;
+  border-top: 1px solid #e2e8f0;
+  background: linear-gradient(to bottom, #f8fafc, #ffffff);
+  border-radius: 0 0 12px 12px;
 }
 
 .search-footer button {
-    width: 100%;
-    padding: 10px;
-    background: transparent;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    color: #3b82f6;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #3b82f6;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .search-footer button:hover {
-    background: #eff6ff;
-    border-color: #3b82f6;
-    color: #2563eb;
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #2563eb;
 }
 
-/* ===== NO RESULTS STATE ===== */
 .search-dropdown.no-results {
-    padding: 32px 24px;
+  padding: 32px 24px;
 }
 
 .no-results-message {
-    text-align: center;
-    color: #64748b;
+  text-align: center;
+  color: #64748b;
 }
 
 .no-results-message i {
-    font-size: 40px;
-    color: #cbd5e1;
-    margin-bottom: 12px;
-    display: block;
+  font-size: 40px;
+  color: #cbd5e1;
+  margin-bottom: 12px;
+  display: block;
 }
 
 .no-results-message p {
-    font-size: 14px;
-    font-weight: 500;
-    margin: 8px 0 4px;
-    color: #475569;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 8px 0 4px;
+  color: #475569;
 }
 
 .no-results-message small {
-    font-size: 12px;
-    color: #94a3b8;
+  font-size: 12px;
+  color: #94a3b8;
 }
 
-/* ===== SCROLLBAR CHO DROPDOWN ===== */
 .search-dropdown::-webkit-scrollbar {
-    width: 6px;
+  width: 6px;
 }
 
 .search-dropdown::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 3px;
+  background: #f1f5f9;
+  border-radius: 3px;
 }
 
 .search-dropdown::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 3px;
+  background: #cbd5e1;
+  border-radius: 3px;
 }
 
 .search-dropdown::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+  background: #94a3b8;
 }
 
-/* ===== HIGHLIGHT TEXT (OPTIONAL) ===== */
 .result-name .highlight {
-    background-color: #fef3c7;
-    font-weight: 600;
-    padding: 0 2px;
-    border-radius: 2px;
+  background-color: #fef3c7;
+  font-weight: 600;
+  padding: 0 2px;
+  border-radius: 2px;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-    .search-dropdown {
-        left: -16px;
-        right: -16px;
-        border-radius: 0 0 12px 12px;
-        max-height: 50vh;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    }
-    
-    .header-search {
-        max-width: none;
-    }
-}
-
-/* ===== KEYBOARD NAVIGATION (OPTIONAL) ===== */
 .search-result-item.focused {
-    background-color: #f1f5f9;
-    outline: 2px solid #3b82f6;
-    outline-offset: -2px;
+  background-color: #f1f5f9;
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
 }
-/* ✅ THÊM STYLE CHO VAT SELECTOR */
+
+/* ===== VAT SELECTOR ===== */
 .vat-row {
-    align-items: center;
+  align-items: center;
 }
 
 .vat-selector {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .vat-dropdown {
-    padding: 4px 8px;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
+  padding: 4px 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+  margin-right: 518px;
+}
+
+.vat-dropdown:hover {
+  border-color: #3c83f5;
+}
+
+.vat-dropdown:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.vat-amount {
+  font-weight: 600;
+  color: #1e293b;
+  min-width: 80px;
+  text-align: right;
+}
+/* Menu item unit */
+.menu-item-unit {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+/* Order item unit */
+.item-unit {
+  font-size: 12px;
+  color: #63676d;
+  display: block;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+.result-meta {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.result-code {
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+.result-category {
+    color: #64748b;
+}
+
+.result-unit {
+    color: #000000;
+    font-weight: 500;
+}
+
+.result-separator {
+    color: #cbd5e1;
+}.result-group {
+    color: #64748b;
+}
+
+.result-group i, .result-unit i {
+    font-size: 10px;
+    margin-right: 2px;
+}
+.filter-dropdown-wrapper {
+      position: relative;
+  flex-shrink: 0;         /* ✅ THÊM - không bị co */
+  white-space: nowrap;
+}
+
+.filter-more-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filter-more-btn i {
+    font-size: 11px;
+    transition: transform 0.2s;
+}
+
+.filter-more-btn i.rotated {
+    transform: rotate(180deg);
+}
+
+.filter-dropdown-menu {
+    position: fixed;        /* ← ĐỔI absolute → fixed */
+    top: auto;              /* ← BỎ top: calc(...) */
+    left: auto;             /* ← để JS tính */
     background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    min-width: 160px;
+    z-index: 9999;          /* ← TĂNG z-index vượt qua mọi thứ */
+    overflow: hidden;
+    animation: slideDown 0.15s ease;
+}
+
+.filter-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    text-align: left;
+    background: none;
+    border: none;
     font-size: 13px;
     font-weight: 500;
     color: #475569;
     cursor: pointer;
-    outline: none;
-    transition: all 0.2s;
-    margin-right: 518px;
-    
+    transition: all 0.15s;
 }
 
-.vat-dropdown:hover {
-    border-color: #3b82f6;
+.filter-dropdown-item:hover {
+    background: #f1f5f9;
+    color: #0067c4;
 }
 
-.vat-dropdown:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.vat-amount {
+.filter-dropdown-item.active {
+    background: #eff6ff;
+    color: #0067c4;
     font-weight: 600;
-    color: #1e293b;
-    min-width: 80px;
-    text-align: right;
+}
+.search-customer { position: relative; }
+
+.customer-search-dropdown {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  z-index: 1000;
+  overflow: hidden;
 }

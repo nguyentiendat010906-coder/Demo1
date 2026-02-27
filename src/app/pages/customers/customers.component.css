@@ -79,6 +79,7 @@ body {
   border: 1px solid #dbe3ef;
   border-radius: 4px;
   overflow: visible;
+  overflow-y: auto;
 }
 
 /* Filter Bar */

@@ -22,8 +22,6 @@ export class CustomerModalComponent implements OnInit, OnChanges {
   
   @ViewChild('customerForm') customerForm!: NgForm;
 
-  // ← XÓA: @Input() customer!: Customer;
-  // ← THÊM: Tạo customer từ editingCustomer
   customer: Customer = this.getEmptyCustomer();
 
   groups: Group[] = [];
@@ -34,6 +32,8 @@ export class CustomerModalComponent implements OnInit, OnChanges {
 
   phoneError: string = '';
   cccdError: string = '';
+  taxCodeError: string = '';
+  emailError: string = ''; // ✅ THÊM: Lỗi email
 
   constructor(private groupService: GroupService, private notificationService: NotificationService) {}
 
@@ -43,7 +43,6 @@ export class CustomerModalComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['visible'] && this.visible) {
-      // Load dữ liệu từ editingCustomer hoặc tạo mới
       if (this.editingCustomer) {
         this.customer = { ...this.editingCustomer };
       } else {
@@ -57,9 +56,9 @@ export class CustomerModalComponent implements OnInit, OnChanges {
       this.submitted = false;
       this.phoneError = '';
       this.cccdError = '';
+      this.emailError = ''; // ✅ THÊM: Reset lỗi email
     }
     
-    // Load lại customer khi editingCustomer thay đổi
     if (changes['editingCustomer'] && this.editingCustomer) {
       this.customer = { ...this.editingCustomer };
     }
@@ -120,6 +119,35 @@ export class CustomerModalComponent implements OnInit, OnChanges {
     }
   }
 
+  // ✅ THÊM: Validation cho email
+  validateEmail() {
+    this.emailError = '';
+    if (!this.customer.email || this.customer.email.trim() === '') {
+      return;
+    }
+
+    const email = this.customer.email.trim();
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    
+    if (!emailRegex.test(email)) {
+      this.emailError = 'Email không hợp lệ';
+    }
+  }
+  // ✅ THÊM hàm này
+  validateTaxCode() {
+  this.taxCodeError = '';
+  if (!this.customer.taxCode || this.customer.taxCode.trim() === '') {
+    return;
+  }
+
+  const taxCode = this.customer.taxCode.trim();
+  const taxCodeRegex = /^[0-9]{10}(-[0-9]{3})?$/;
+  
+  if (!taxCodeRegex.test(taxCode)) {
+    this.taxCodeError = 'Mã số thuế phải có 10 số hoặc 10 số + 3 số (VD: 0123456789 hoặc 0123456789-001)';
+  }
+}
+
   openAddGroup() {
     this.editingGroup = null;
     this.showGroupModal = true;
@@ -156,7 +184,6 @@ export class CustomerModalComponent implements OnInit, OnChanges {
     }
   }
 
-  // ✅ CẬP NHẬT: handleDeleteGroup
   async handleDeleteGroup(group: any) {
     const confirmed = await this.notificationService.confirm({
       title: 'Xác nhận xóa nhóm',
@@ -179,12 +206,14 @@ export class CustomerModalComponent implements OnInit, OnChanges {
     }
   }
 
-  // ✅ CẬP NHẬT: saveModal
+  // ✅ CẬP NHẬT: Thêm kiểm tra email
   saveModal() {
     this.submitted = true;
 
     this.validatePhone();
     this.validateCCCD();
+    this.validateEmail(); // ✅ THÊM: Kiểm tra email
+    this
 
     if (this.customerForm) {
       Object.keys(this.customerForm.controls).forEach(key => {
@@ -192,42 +221,54 @@ export class CustomerModalComponent implements OnInit, OnChanges {
       });
     }
 
-    if (this.customerForm && this.customerForm.valid && !this.phoneError && !this.cccdError) {
+    // ✅ CẬP NHẬT: Thêm điều kiện kiểm tra emailError và taxCodeError
+    if (this.customerForm && this.customerForm.valid && !this.phoneError && !this.cccdError && !this.emailError && !this.taxCodeError) {
       this.save.emit(this.customer);
       this.submitted = false;
       this.phoneError = '';
       this.cccdError = '';
+      this.emailError = ''; // ✅ THÊM: Reset lỗi email
+      this.taxCodeError = ''; // ✅ THÊM: Reset lỗi mã số thuế
     } else {
-      // ✅ Hiển thị lỗi validation
+      // ✅ CẬP NHẬT: Hiển thị lỗi email
       if (this.phoneError) {
         this.notificationService.warning(this.phoneError);
       } else if (this.cccdError) {
         this.notificationService.warning(this.cccdError);
+      } else if (this.emailError) {
+        this.notificationService.warning(this.emailError);
+      } else if (this.taxCodeError) {
+        this.notificationService.warning(this.taxCodeError);
       } else {
         this.notificationService.warning('Vui lòng điền đầy đủ thông tin bắt buộc');
       }
     }
   }
 
-
   closeModal() {
     this.submitted = false;
     this.phoneError = '';
     this.cccdError = '';
+    this.emailError = ''; // ✅ THÊM: Reset lỗi email
+    this.taxCodeError = ''; // ✅ THÊM: Reset lỗi mã số thuế
     this.close.emit();
   }
-showCustomerGroupDropdown = false;
 
-getCustomerSelectedGroupText(): string {
-  if (this.customer.groupID === undefined) return 'Chọn nhóm';
-  const g = this.groups.find(g => g.id === this.customer.groupID);
-  return g ? `${g.code} - ${g.name}` : 'Chọn nhóm';
-}
+  showCustomerGroupDropdown = false;
 
-editCustomerGroup(group: any, event: Event): void {
-  event.stopPropagation();
-  this.showCustomerGroupDropdown = false;
-  this.editingGroup = group;
-  this.showGroupModal = true;
+  getCustomerSelectedGroupText(): string {
+    if (this.customer.groupID === undefined) return 'Chọn nhóm';
+    const g = this.groups.find(g => g.id === this.customer.groupID);
+    return g ? `${g.code} - ${g.name}` : 'Chọn nhóm';
+  }
+
+  editCustomerGroup(group: any, event: Event): void {
+    event.stopPropagation();
+    this.showCustomerGroupDropdown = false;
+    this.editingGroup = group;
+    this.showGroupModal = true;
+  }
+  removeReadonly(event: Event): void {
+  (event.target as HTMLElement).removeAttribute('readonly');
 }
 }

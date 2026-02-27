@@ -40,10 +40,17 @@
         </button>
       </div>
       <div class="footer-right">
-        <button class="btn-secondary" (click)="close()">Hủy</button>
         <button class="btn-primary" (click)="submit()">
-          {{ editMode ? 'Cập nhật' : 'Thêm mới' }}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M13 4L6 11L3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>Lưu
         </button>
+        <button class="btn-secondary" (click)="close()">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+          Đóng</button>
+        
       </div>
     </div>
   </div>

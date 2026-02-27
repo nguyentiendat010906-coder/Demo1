@@ -20,7 +20,6 @@
         <label><input type="checkbox" [(ngModel)]="visibleColumns.name" (change)="saveVisibleColumns()"> Tên món</label>
         <label><input type="checkbox" [(ngModel)]="visibleColumns.price" (change)="saveVisibleColumns()"> Giá</label>
         <label><input type="checkbox" [(ngModel)]="visibleColumns.unit" (change)="saveVisibleColumns()"> ĐVT</label>
-        <label><input type="checkbox" [(ngModel)]="visibleColumns.stock" (change)="saveVisibleColumns()"> Tồn kho</label>
       </div>
     </div>
 
@@ -120,7 +119,6 @@
               <th *ngIf="visibleColumns.name">Tên món</th>
               <th *ngIf="visibleColumns.price">Giá</th>
               <th *ngIf="visibleColumns.unit">ĐVT</th>
-              <th *ngIf="visibleColumns.stock">Tồn kho</th>
             </tr>
           </thead>
           <tbody>
@@ -147,7 +145,6 @@
               <td *ngIf="visibleColumns.name">{{ product.name }}</td>
               <td *ngIf="visibleColumns.price">{{ product.price | number }}đ</td>
               <td *ngIf="visibleColumns.unit">{{ product.unitType }}</td>
-              <td *ngIf="visibleColumns.stock">{{ product.stock }}</td>
             </tr>
           </tbody>
         </table>

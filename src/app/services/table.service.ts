@@ -10,6 +10,7 @@ export interface ApiTable {
   status: TableStatus;
   tableGroupId: number;
   tableGroupName?: string;
+  orderCode?: string; // Thêm orderCode
 }
 
 @Injectable({
@@ -67,10 +68,14 @@ export class TableService {
       {}
     );
   }
-// Thêm vào TableService
-getTableById(tableId: number): Observable<any> {
-  return this.http.get(`${this.apiUrl}/${tableId}`);
-}
+
+  // ===============================
+  // GET: lấy thông tin bàn theo ID
+  // ===============================
+  getTableById(tableId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${tableId}`);
+  }
+
   // ===============================
   // 👉 GET: invoice đang mở theo bàn
   // ===============================
@@ -79,4 +84,20 @@ getTableById(tableId: number): Observable<any> {
       `https://localhost:44385/api/invoices/by-table/${tableId}`
     );
   }
+
+  // ===============================
+  // 👉 POST: TẠO ĐỠN HÀNG VỚI MÃ TỰ ĐỘNG
+  // ===============================
+  createOrder(orderData: {
+  tableId: number;        // ✅ ĐỔI: Dùng tableId
+  invoiceId: number;
+}): Observable<{ orderCode: string; id: number }> {
+  return this.http.post<{ orderCode: string; id: number }>(
+    `${this.apiUrl}/create-order`,
+    {
+      TableId: orderData.tableId,     // ✅ ĐỔI
+      InvoiceId: orderData.invoiceId
+    }
+  );
+}
 }
